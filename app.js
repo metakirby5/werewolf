@@ -49,11 +49,11 @@ app.use(function(req, res, next) {
     next(err);
 });
 
-/// error handlers
-
-// development error handler
-// will print stacktrace
+// dev settings
 if (app.get('env') === 'development') {
+    app.locals.pretty = true;
+
+    // will print stacktrace
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
         res.render('error', {

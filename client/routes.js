@@ -11,7 +11,7 @@ router.
   }).
   get('/room/:room', function(req, res) {
     res.render('room', {
-      title: 'Room ' + req.params.room,
+      title: 'Werewolf',
       css: ['room'],
       js: ['room'],
       room: req.params.room
