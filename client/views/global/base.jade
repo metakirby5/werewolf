@@ -1,0 +1,22 @@
+include mixins
+
+doctype html
+html
+  head
+    title=title
+    // Global stylesheets
+    include css
+    // Page stylesheets
+    if css
+      for sheet in css
+        +css('/css/'+sheet+'.css')
+  body
+    .container(ng-app=(ngApp ? ngApp : undefined))
+      block content
+    // Global scripts
+    include js
+    // Page scripts
+    if js
+      for script in js
+        +js('/js/'+script+'.js')
+
