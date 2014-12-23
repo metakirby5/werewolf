@@ -16,6 +16,7 @@
     "morgan": "~1.0.0",
     "nib": "^1.0.3",
     "static-favicon": "~1.0.0",
-    "stylus": "0.42.3"
+    "stylus": "0.42.3",
+    "socket.io": "~1.2.1"
   }
 }

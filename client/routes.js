@@ -8,6 +8,14 @@ router.
       title: 'Express',
       css: ['index']
     });
+  }).
+  get('/room/:room', function(req, res) {
+    res.render('room', {
+      title: 'Room ' + req.params.room,
+      css: ['room'],
+      js: ['room'],
+      room: req.params.room
+    })
   });
 
 module.exports = router;
