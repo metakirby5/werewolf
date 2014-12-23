@@ -12,7 +12,9 @@ var DIR_CLIENT = path.join(__dirname, 'client');
 var DIR_STATIC = path.join(__dirname, 'static');
 
 var app = express();
-mongoose.connect('mongodb://localhost/PROJECT');
+mongoose.connect('mongodb://localhost/PROJECT', function(err, res) {
+    console.log(err ? 'MONGODB ERROR: ' + err : 'MONGODB SUCCESS');
+});
 
 app.set('views', path.join(DIR_CLIENT, 'views'));
 app.set('view engine', 'jade');
