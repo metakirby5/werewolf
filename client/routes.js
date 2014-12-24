@@ -5,8 +5,9 @@ var router = express.Router();
 router.
   get('/', function(req, res) {
     res.render('index', {
-      title: 'Express',
-      css: ['index']
+      title: 'Werewolf',
+      css: ['index'],
+      js: ['index']
     });
   }).
   get('/room/:room', function(req, res) {

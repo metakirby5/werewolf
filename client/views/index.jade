@@ -3,3 +3,8 @@ extends global/base
 block content
   h1=title
   p Welcome to #{title}
+  p Please make a room
+  form#make-room.form-inline(action="/api/rooms")
+    fieldset
+      input.form-control(type="text" name="roomName" placeholder="Room name")
+      button.btn.btn-primary(type="submit") Create

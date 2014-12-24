@@ -40,7 +40,8 @@ app.use(express.static(DIR_STATIC));
 
 // Routes
 app.use('/', require('./client/routes.js'));
-app.use('/api', require('./server/routes.js'));
+app.use('/api/rooms', require('./server/routes/rooms.js'));
+app.use('/api/sample', require('./server/routes/sample.js'));
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {

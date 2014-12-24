@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var item = require('./models/item.js');
+var item = require('./../models/item.js');
 
 // REST API
 router.
