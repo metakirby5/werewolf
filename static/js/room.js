@@ -11,15 +11,17 @@
 
     socket.on('joinedRoom', function() {
       console.log('joined room - adding user ' + $.cookie('userId'));
-      socket.emit('addOrGetUser', $.cookie('userId'));
+      socket.emit('getUser', $.cookie('userId'));
     });
 
-    socket.on('roomNotFound', function() {
-      console.log('room not found!');
+    socket.on('userNotFound', function() {
+      console.log('user not found, prompting for info...');
+      var name = 'NAME'; // TODO: get this from frontend
+      socket.emit('addUser', {userId: $.cookie('userId'), name: name});
     });
 
-    socket.on('assignUser', function(iUser) {
-      console.log('got user');
+    socket.on('foundUser', function(iUser) {
+      console.log('found user');
       console.log(iUser);
       user = iUser;
     });

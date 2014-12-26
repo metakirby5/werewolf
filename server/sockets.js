@@ -16,39 +16,73 @@ module.exports = function(io) {
     });
 
     socket.on('joinRoom', function(roomId) {
-      socket.join(roomId);
-      console.log('socket ' + socket.id + ' joined channel ' + roomId);
       room = rooms.getRoom(roomId);
       if (room) {
+        socket.join(roomId);
+        console.log('socket ' + socket.id + ' joined channel ' + roomId + ': ' + room.getName());
         socket.emit('joinedRoom');
-        console.log('socket ' + socket.id + ' joined ' + room.getName());
       } else {
-        socket.emit('roomNotFound');
         console.log('roomId ' + roomId + ' not found, aborting');
       }
     });
 
-    // TODO: split addOrGet -> get, add. client-side, if we could not get, then we prompt for name, etc.
-    socket.on('addOrGetUser', function(userId) {
-      // Try to get or add user
-      var id = cookieParser.signedCookie(userId, secret);
-      console.log('getting user ' + id);
-      var success = true;
-      user = room.getUser(id);
-      if (!user) {
-        // TODO: get name, role, etc. from client. make first user to connect the mod.
-        user = new User(id, socket, 'NAME');
-        success = room.addUser(user);
+    // Helper function to get signed cookie or null
+    function parseSignedCookie(cookie) {
+      var parsed = cookieParser.signedCookie(cookie, secret);
+      if (cookie === parsed)
+        return null;
+      return parsed;
+    }
+
+    socket.on('getUser', function(userId) {
+      var parsedId = parseSignedCookie(userId);
+      if (!parsedId) {
+        console.log('cookie ' + userId + ' was invalid!');
+        return;
       }
 
-      console.log(user.repr());
-      console.log(room.getUserCount() + ' users now in room ' + room.getName());
+      console.log('getting user ' + parsedId);
+      user = room.getUser(parsedId);
+      if (user) {
+        console.log('found user');
+        console.log(user.repr());
+        socket.emit('foundUser', user.repr());
+      } else {
+        console.log('user not found, requesting info');
+        socket.emit('userNotFound');
+      }
+    });
+
+    socket.on('addUser', function(data) {
+      // Safety checks
+      if (!data)
+        return;
+      if (!('userId' in data && 'name' in data))
+        return;
+
+      var userId = data.userId,
+          name = data.name;
+
+      // Try to get or add user
+      var parsedId = parseSignedCookie(userId);
+      if (!parsedId) {
+        console.log('cookie ' + userId + ' was invalid!');
+        return;
+      }
+
+      console.log('adding user ' + parsedId + ': ' + name);
+      user = new User(parsedId, socket, name);
+      var success = room.addUser(user);
 
       // Return the user
-      if (success)
-        socket.emit('assignUser', user.repr());
-      else
+      if (success) {
+        console.log(user.repr());
+        console.log(room.getUserCount() + ' users now in room ' + room.getName());
+        socket.emit('foundUser', user.repr());
+      } else {
+        console.log('room was full');
         socket.emit('roomFull');
+      }
     });
   });
 };
