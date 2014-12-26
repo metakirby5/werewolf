@@ -28,6 +28,7 @@ module.exports = function(io) {
       }
     });
 
+    // TODO: split addOrGet -> get, add. client-side, if we could not get, then we prompt for name, etc.
     socket.on('addOrGetUser', function(userId) {
       // Try to get or add user
       var id = cookieParser.signedCookie(userId, secret);
