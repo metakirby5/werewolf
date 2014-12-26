@@ -11,6 +11,7 @@ module.exports = function(io) {
     var room, user;
 
     socket.on('disconnect', function() {
+      // TODO: if mod d/cs, end the game and delete the room
       console.log('disconnected');
     });
 
@@ -34,6 +35,7 @@ module.exports = function(io) {
       var success = true;
       user = room.getUser(id);
       if (!user) {
+        // TODO: get name, role, etc. from client. make first user to connect the mod.
         user = new User(id, socket, 'NAME');
         success = room.addUser(user);
       }
