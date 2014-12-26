@@ -24,6 +24,19 @@ var User = function(socket, name, card, state, id) {
   });
 
   /**
+   * Returns a JSON representation of user
+   * @returns {{id: *, name: *, card: *, state: *}} representation
+   */
+  this.repr = function() {
+    return {
+      id: _id,
+      name: _name,
+      card: _card,
+      state: this.state
+    };
+  };
+
+  /**
    * Getter for id.
    * @returns id
    */

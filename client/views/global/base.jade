@@ -13,6 +13,10 @@ html
   body
     .container(ng-app=(ngApp ? ngApp : undefined))
       block content
+    if locals.extra
+      // Extra variables
+      script(type='text/javascript').
+        $ww = !{JSON.stringify(extra)};
     // Global scripts
     include js
     // Page scripts

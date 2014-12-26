@@ -9,8 +9,7 @@ router.
   get('/', function(req, res) {
     res.render('index', {
       title: 'Werewolf',
-      css: ['index'],
-      js: ['index']
+      css: ['index']
     });
   }).
   get('/room/:id', function(req, res) {
@@ -31,7 +30,8 @@ router.
       title: 'Werewolf',
       css: ['room'],
       js: ['room'],
-      room: room.getName()
+      room: room.getName(),
+      extra: room.repr()
     });
   });
 

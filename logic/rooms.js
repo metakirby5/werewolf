@@ -18,6 +18,8 @@ var Room = function(id, name, pub, maxUsers) {
   var _maxUsers = maxUsers !== undefined ? maxUsers : -1;   // no max by default
   var _users = {};
 
+  this.game = 'TEMP';
+
   /**
    * Returns a JSON representation of the room
    * @returns {{id: *, name: *, pub: *, curUsers: *, maxUsers: *}} The room representation
@@ -99,10 +101,10 @@ var Room = function(id, name, pub, maxUsers) {
   /**
    * Gets a user from the room
    * @param userId  The id to get
-   * @returns       The user if they exist, else null
+   * @returns       The user if they exist, else undefined
    */
   this.getUser = function(userId) {
-    return (userId in _users) ? _users[userId] : null;
+    return (userId in _users) ? _users[userId] : undefined;
   };
 
   /**
