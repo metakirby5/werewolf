@@ -38,7 +38,6 @@ router.route('/').
     if (Object.keys(errs).length)
       res.status(400).json(errs);
     else
-      //res.status(201).json(rooms.newRoom(name, pub, maxUsers).repr());
       res.redirect('/room/' + rooms.newRoom(name, pub, maxUsers).getId());
   });
 

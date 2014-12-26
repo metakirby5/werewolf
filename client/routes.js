@@ -17,7 +17,8 @@ router.
     var room = rooms.getRoom(req.params['id']);
     if (room === undefined) {
       res.status(404).render('roomNotFound', {
-        title: 'Werewolf'
+        title: 'Werewolf',
+        roomId: req.params['id']
       });
       return;
     }

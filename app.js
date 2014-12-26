@@ -11,6 +11,9 @@ var nib = require('nib');
 var DIR_CLIENT = path.join(__dirname, 'client');
 var DIR_STATIC = path.join(__dirname, 'static');
 
+if (process.env.COOKIE_SECRET === undefined)
+    process.env.COOKIE_SECRET = 'dev';
+
 var app = express();
 
 app.set('views', path.join(DIR_CLIENT, 'views'));
@@ -21,7 +24,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(multer());
-app.use(cookieParser(process.env.COOKIE_SECRET !== undefined ? process.env.COOKIE_SECRET : 'developer'));
+app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(stylus.middleware({
     // For some reason, stylus middleware needs trailing slashes
     src: path.join(DIR_CLIENT, 'styl/'),

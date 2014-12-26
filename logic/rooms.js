@@ -113,7 +113,7 @@ var Room = function(id, name, pub, maxUsers) {
    * @returns Success or failure
    */
   this.addUser = function(user) {
-    if (this.getUserCount() < maxUsers) {
+    if (_maxUsers === -1 || this.getUserCount() < _maxUsers) {
       _users[user.getId()] = user;
       return true;
     } else

@@ -9,7 +9,7 @@ var uuid = require('node-uuid');
  * @param id      (optional) The user's id
  * @constructor
  */
-var User = function(socket, name, card, state, id) {
+var User = function(id, socket, name, card, state) {
   var _id = id ? id : uuid.v4();
   var _socket = socket ? socket : null;
   var _name = name ? name : 'Noname';
