@@ -15,12 +15,14 @@ module.exports = function(io) {
     });
 
     socket.on('joinRoom', function(roomId) {
+      socket.join(roomId);
+      console.log('socket ' + socket.id + ' joined channel ' + roomId);
       room = rooms.getRoom(roomId);
-      socket.join(room);
       if (room) {
         socket.emit('joinedRoom');
         console.log('socket ' + socket.id + ' joined ' + room.getName());
       } else {
+        socket.emit('roomNotFound');
         console.log('roomId ' + roomId + ' not found, aborting');
       }
     });

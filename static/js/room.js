@@ -14,6 +14,10 @@
       socket.emit('addOrGetUser', $.cookie('userId'));
     });
 
+    socket.on('roomNotFound', function() {
+      console.log('room not found!');
+    });
+
     socket.on('assignUser', function(iUser) {
       console.log('got user');
       console.log(iUser);
