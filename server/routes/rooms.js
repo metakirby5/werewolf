@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var util = require('../../util');
-var rooms = require('../logic/rooms');
+var rooms = require('../../logic/rooms');
 
 router.
   route('/').
@@ -13,7 +13,7 @@ router.
       }));
     }).
 
-    // Creates a new room and responds with its repr
+    // Creates a new room and responds with a redirect
     post(function(req, res) {
       var body = req.body;
       var errs = {};
@@ -39,7 +39,8 @@ router.
       if (Object.keys(errs).length)
         res.status(400).json(errs);
       else
-        res.status(201).json(rooms.newRoom(name, pub, maxUsers).repr());
+        //res.status(201).json(rooms.newRoom(name, pub, maxUsers).repr());
+        res.redirect('/room/' + rooms.newRoom(name, pub, maxUsers).getId());
     });
 
     // Rooms are cleaned once everyone has left.

@@ -89,6 +89,14 @@ var Room = function(id, name, pub, maxUsers) {
   };
 
   /**
+   * Getter for number of users in the room
+   * @returns Number of users in room
+   */
+  this.getUserCount = function() {
+    return Object.keys(_users).length;
+  };
+
+  /**
    * Gets a user from the room
    * @param userId  The id to get
    * @returns       The user if they exist, else null
@@ -98,11 +106,16 @@ var Room = function(id, name, pub, maxUsers) {
   };
 
   /**
-   * Adds a user to the room
-   * @param user
+   * Adds a user to the room, if possible
+   * @param   user
+   * @returns Success or failure
    */
   this.addUser = function(user) {
-    _users[user.getId()] = user;
+    if (this.getUserCount() < maxUsers) {
+      _users[user.getId()] = user;
+      return true;
+    } else
+      return false;
   };
 
   /**

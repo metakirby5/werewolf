@@ -21,7 +21,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(multer());
-app.use(cookieParser());
+app.use(cookieParser(process.env.COOKIE_SECRET !== undefined ? process.env.COOKIE_SECRET : 'developer'));
 app.use(stylus.middleware({
     // For some reason, stylus middleware needs trailing slashes
     src: path.join(DIR_CLIENT, 'styl/'),
