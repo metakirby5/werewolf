@@ -1,5 +1,7 @@
 (function($ww, $, _, io) {
 
+  'use strict';
+
   var socket = io.connect();
   var user;
 
