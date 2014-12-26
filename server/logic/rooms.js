@@ -1,5 +1,6 @@
 var shortId = require('shortid');
 
+var TIMEOUT = 5000; // ms
 var rooms = {};
 
 /**
@@ -138,18 +139,31 @@ var getRoom = function(id) {
 };
 
 /**
- * Generates a new room and returns it.
+ * Generates a new room and returns it. If it takes longer than
  * @param name      The name of the room
  * @param pub       Whether or not the room is public
  * @param maxUsers  The max users for this room
- * @returns         The newly created room
+ * @returns         The newly created room if creatable; null otherwise
  */
 var newRoom = function(name, pub, maxUsers) {
   var id = shortId.generate();
 
+  // Timeout in case it takes too long
+  var expired = false;
+  var timeout = setTimeout(function() {
+    expired = true;
+  }, TIMEOUT);
+
   // Until we get an unused id
-  while(id in rooms)
+  while(!expired && id in rooms)
     id = shortId.generate();
+
+  // Clear the timeout
+  clearTimeout(timeout);
+
+  // Did we fail?
+  if (expired)
+    return null;
 
   rooms[id] = new Room(id, name, pub, maxUsers);
 
