@@ -19,6 +19,7 @@
     "stylus": "0.42.3",
     "socket.io": "~1.2.1",
     "shortid": "~2.1.3",
-    "node-uuid": "~1.4.2"
+    "node-uuid": "~1.4.2",
+    "multer": "~0.1.6"
   }
 }

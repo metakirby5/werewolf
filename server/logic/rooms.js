@@ -4,14 +4,32 @@ var rooms = {};
 
 /**
  * Represents a game room.
- * @param id    The ID assigned to the room
- * @param name  The name of the room
+ * @param id        The ID assigned to the room
+ * @param name      The name of the room
+ * @param pub       (optional) Whether or not this room is public
+ * @param maxUsers  (optional) The maximum number of users; -1 for no max
  * @constructor
  */
-var Room = function(id, name) {
+var Room = function(id, name, pub, maxUsers) {
   var _id = id;
   var _name = name;
+  var _pub = pub !== undefined ? pub : true;                // public by default
+  var _maxUsers = maxUsers !== undefined ? maxUsers : -1;   // no max by default
   var _users = {};
+
+  /**
+   * Returns a JSON of the room state
+   * @returns {{id: *, name: *, pub: *, curUsers: *, maxUsers: *}} The room state
+   */
+  this.state = function() {
+    return {
+      id: _id,
+      name: _name,
+      pub: _pub,
+      curUsers: Object.keys(_users).length,
+      maxUsers: _maxUsers
+    };
+  };
 
   /**
    * Getter for id
@@ -35,6 +53,38 @@ var Room = function(id, name) {
    */
   this.setName = function(newName) {
     _name = newName;
+  };
+
+  /**
+   * Getter for pub
+   * @returns pub
+   */
+  this.isPublic = function() {
+    return _pub;
+  };
+
+  /**
+   * Setter for pub
+   * @param pub   New value of pub
+   */
+  this.setPublic = function(pub) {
+    _pub = pub;
+  };
+
+  /**
+   * Getter for maxUsers
+   * @returns maxUsers
+   */
+  this.getMaxUsers = function() {
+    return _maxUsers;
+  };
+
+  /**
+   * Setter for maxUsers
+   * @param maxUsers  New value of maxUsers
+   */
+  this.setMaxUsers = function(maxUsers) {
+    _maxUsers = maxUsers;
   };
 
   /**
@@ -64,6 +114,21 @@ var Room = function(id, name) {
 };
 
 /**
+ * Returns all public rooms.
+ * @returns {Array} All public rooms.
+ */
+var getPublicRooms = function() {
+  var pubRooms = [];
+  for (var room in rooms) {
+    if (rooms.hasOwnProperty(room))
+      if (rooms[room].isPublic())
+        pubRooms.push(rooms[room]);
+  }
+
+  return pubRooms;
+};
+
+/**
  * Getter for room by id
  * @param id  The room to get
  * @returns   The requested room
@@ -74,17 +139,19 @@ var getRoom = function(id) {
 
 /**
  * Generates a new room and returns it.
- * @param name  The name of the room
- * @returns     The newly created room
+ * @param name      The name of the room
+ * @param pub       Whether or not the room is public
+ * @param maxUsers  The max users for this room
+ * @returns         The newly created room
  */
-var newRoom = function(name) {
+var newRoom = function(name, pub, maxUsers) {
   var id = shortId.generate();
 
   // Until we get an unused id
   while(id in rooms)
     id = shortId.generate();
 
-  rooms[id] = new Room(id, name);
+  rooms[id] = new Room(id, name, pub, maxUsers);
 
   return rooms[id];
 };
@@ -97,6 +164,7 @@ var deleteRoom = function(id) {
   delete rooms[id];
 };
 
+module.exports.getPublicRooms = getPublicRooms;
 module.exports.getRoom = getRoom;
 module.exports.newRoom = newRoom;
 module.exports.deleteRoom = deleteRoom;

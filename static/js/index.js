@@ -10,8 +10,10 @@
       var url = $roomForm.attr('action'),
           roomName = $roomForm.find('input:text[name="roomName"]').val();
 
-      $.post(url, {name: roomName}, function(data) {
+      // TODO: make pub user-input
+      $.post(url, {name: roomName, pub: true}, function(data) {
         console.log(data);
+        // TODO: redirect to newly created room
       });
     });
   }

@@ -1,10 +1,10 @@
 var express = require('express');
-var mongoose = require('mongoose');
 var path = require('path');
 var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var multer = require('multer');
 var stylus = require('stylus');
 var nib = require('nib');
 
@@ -12,9 +12,6 @@ var DIR_CLIENT = path.join(__dirname, 'client');
 var DIR_STATIC = path.join(__dirname, 'static');
 
 var app = express();
-mongoose.connect('mongodb://localhost/werewolf', function(err, res) {
-    console.log(err ? 'MONGODB ERROR: ' + err : 'MONGODB SUCCESS');
-});
 
 app.set('views', path.join(DIR_CLIENT, 'views'));
 app.set('view engine', 'jade');
@@ -22,7 +19,8 @@ app.set('view engine', 'jade');
 app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(multer());
 app.use(cookieParser());
 app.use(stylus.middleware({
     // For some reason, stylus middleware needs trailing slashes
@@ -41,7 +39,6 @@ app.use(express.static(DIR_STATIC));
 // Routes
 app.use('/', require('./client/routes.js'));
 app.use('/api/rooms', require('./server/routes/rooms.js'));
-app.use('/api/sample', require('./server/routes/sample.js'));
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
