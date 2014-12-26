@@ -23,6 +23,7 @@ module.exports = function(io) {
         socket.emit('joinedRoom');
       } else {
         console.log('roomId ' + roomId + ' not found, aborting');
+        socket.emit('roomNotFound');
       }
     });
 

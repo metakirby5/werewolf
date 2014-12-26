@@ -14,6 +14,10 @@
       socket.emit('getUser', $.cookie('userId'));
     });
 
+    socket.on('roomNotFound', function() {
+      console.log('room closed');
+    });
+
     socket.on('userNotFound', function() {
       console.log('user not found, prompting for info...');
       var name = 'NAME'; // TODO: get this from frontend
