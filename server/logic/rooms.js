@@ -6,14 +6,14 @@ var rooms = {};
 /**
  * Represents a game room.
  * @param id        The ID assigned to the room
- * @param name      The name of the room
+ * @param name      (optional) The name of the room
  * @param pub       (optional) Whether or not this room is public
  * @param maxUsers  (optional) The maximum number of users; -1 for no max
  * @constructor
  */
 var Room = function(id, name, pub, maxUsers) {
   var _id = id;
-  var _name = name;
+  var _name = name !== undefined ? name : 'Untitled Room';
   var _pub = pub !== undefined ? pub : true;                // public by default
   var _maxUsers = maxUsers !== undefined ? maxUsers : -1;   // no max by default
   var _users = {};
@@ -132,7 +132,7 @@ var getPublicRooms = function() {
 /**
  * Getter for room by id
  * @param id  The room to get
- * @returns   The requested room
+ * @returns   The requested room if it exists; undefined otherwise
  */
 var getRoom = function(id) {
   return rooms[id];

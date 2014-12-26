@@ -1,13 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
+var util = require('../../util');
 var rooms = require('../logic/rooms');
 
-// TODO: check for all parameters for api, respond with err if not present
-// TODO: parse ints to ints, etc.
 router.
   route('/').
-    // Respons with all public rooms state
+    // Responds with all public rooms state
     get(function(req, res) {
       res.status(200).json(rooms.getPublicRooms().map(function(room) {
         return room.state();
@@ -16,8 +15,31 @@ router.
 
     // Creates a new room and responds with state
     post(function(req, res) {
-      console.log(req.body);
-      res.status(201).json(rooms.newRoom(req.body['name'], req.body['pub'], req.body['maxUsers']).state());
+      var body = req.body;
+      var errs = {};
+
+      var name = body['name'];
+      var pub = body['pub'];
+      var maxUsers = body['maxUsers'];
+
+      // Error checking and casting
+      if (pub !== undefined) {
+        pub = util.boolOrUndefined(pub);
+        if (pub === undefined)
+          errs['pub'] = 'Could not parse into boolean';
+      }
+
+      if (maxUsers !== undefined) {
+        maxUsers = +maxUsers;
+        if (isNaN(maxUsers))
+          errs['maxUsers'] = 'Could not parse into integer';
+      }
+
+      // If any errors, we give em back the errors
+      if (Object.keys(errs).length)
+        res.status(400).json(errs);
+      else
+        res.status(201).json(rooms.newRoom(name, pub, maxUsers).state());
     });
 
     // Rooms are cleaned once everyone has left.
@@ -26,8 +48,13 @@ router.
 
     // Gets a specific room state
     get(function(req, res) {
-      // TODO: check if id even exists before calling state
-      res.status(200).json(rooms.getRoom(req.params['id']).state());
+      var room = rooms.getRoom(req.params['id']);
+
+      // Error checking
+      if (room === undefined)
+        res.status(400).json({id: 'ID not found'});
+      else
+        res.status(200).json(room.state());
     });
 
 module.exports = router;
