@@ -6,14 +6,14 @@ var rooms = require('../logic/rooms');
 
 router.
   route('/').
-    // Responds with all public rooms state
+    // Responds with all public rooms repr
     get(function(req, res) {
       res.status(200).json(rooms.getPublicRooms().map(function(room) {
-        return room.state();
+        return room.repr();
       }));
     }).
 
-    // Creates a new room and responds with state
+    // Creates a new room and responds with its repr
     post(function(req, res) {
       var body = req.body;
       var errs = {};
@@ -39,14 +39,14 @@ router.
       if (Object.keys(errs).length)
         res.status(400).json(errs);
       else
-        res.status(201).json(rooms.newRoom(name, pub, maxUsers).state());
+        res.status(201).json(rooms.newRoom(name, pub, maxUsers).repr());
     });
 
     // Rooms are cleaned once everyone has left.
 router.
   route('/:id').
 
-    // Gets a specific room state
+    // Gets a specific room repr
     get(function(req, res) {
       var room = rooms.getRoom(req.params['id']);
 
@@ -54,7 +54,7 @@ router.
       if (room === undefined)
         res.status(400).json({id: 'ID not found'});
       else
-        res.status(200).json(room.state());
+        res.status(200).json(room.repr());
     });
 
 module.exports = router;

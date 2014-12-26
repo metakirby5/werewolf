@@ -19,10 +19,10 @@ var Room = function(id, name, pub, maxUsers) {
   var _users = {};
 
   /**
-   * Returns a JSON of the room state
-   * @returns {{id: *, name: *, pub: *, curUsers: *, maxUsers: *}} The room state
+   * Returns a JSON representation of the room
+   * @returns {{id: *, name: *, pub: *, curUsers: *, maxUsers: *}} The room representation
    */
-  this.state = function() {
+  this.repr = function() {
     return {
       id: _id,
       name: _name,
