@@ -23,7 +23,7 @@ module.exports = function(io) {
         socket.emit('room:joined');
       } else {
         console.log('roomId ' + roomId + ' not found, aborting');
-        socket.emit('notif:err', 'Room not found!');
+        socket.emit('notif:danger', 'Room not found!');
       }
     });
 
@@ -39,7 +39,7 @@ module.exports = function(io) {
       var parsedId = parseSignedCookie(userId);
       if (!parsedId) {
         console.log('cookie ' + userId + ' was invalid!');
-        socket.emit('notif:err', 'Please clear your cookies.');
+        socket.emit('notif:danger', 'Please clear your cookies.');
         return;
       }
 
@@ -60,7 +60,7 @@ module.exports = function(io) {
     socket.on('user:add', function(data) {
       // Safety checks
       if (!data || !('userId' in data && 'name' in data)) {
-        socket.emit('notif:err', 'Oops! Please try again.');
+        socket.emit('notif:danger', 'Oops! Please try again.');
         return;
       }
 
@@ -71,7 +71,7 @@ module.exports = function(io) {
       var parsedId = parseSignedCookie(userId);
       if (!parsedId) {
         console.log('cookie ' + userId + ' was invalid!');
-        socket.emit('notif:err', 'Please clear your cookies.');
+        socket.emit('notif:danger', 'Please clear your cookies.');
         return;
       }
 
@@ -85,7 +85,7 @@ module.exports = function(io) {
         socket.emit('notif:success', 'Added ' + name + ' to the room!');
       } catch (e) {
         console.log(e);
-        socket.emit('notif:err', e);
+        socket.emit('notif:danger', e);
       }
     });
   });

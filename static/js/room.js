@@ -28,7 +28,11 @@
     }
 
     Notif.prototype.dismiss = function() {
-      thiz.notifs.splice(thiz.notifs.indexOf(this), 1);
+      var idx = thiz.notifs.indexOf(this);
+      // Did we already dismiss?
+      if (idx === -1)
+        return;
+      thiz.notifs.splice(idx, 1);
       $scope.$apply();
     };
 
@@ -37,7 +41,7 @@
     function addNotif(msg, type) {
       var notif = new Notif(msg, type);
       thiz.notifs.unshift(notif); // TODO: figure out best notif anims
-      setTimeout(notif.dismiss, NOTIF_TIMEOUT);
+      setTimeout(_.bind(notif.dismiss, notif), NOTIF_TIMEOUT);
     }
 
     // Client messages
@@ -58,7 +62,7 @@
     socket.on('notif:warning', function(warning) {
       addNotif(warning, 'warning');
     });
-    socket.on('notif:err', function(err) {
+    socket.on('notif:danger', function(err) {
       addNotif(err, 'danger');
     });
   }]);
