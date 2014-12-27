@@ -3,6 +3,8 @@ var secret = process.env.COOKIE_SECRET;
 var rooms = require('../logic/rooms');
 var User = require('../logic/user').User;
 
+'use strict';
+
 module.exports = function(io) {
 
   io.on('connection', function(socket) {

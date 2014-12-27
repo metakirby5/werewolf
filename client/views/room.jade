@@ -5,7 +5,7 @@ block content
   div(ng-controller='tabsCtrl as tc')
     .notifs(ng-controller='notifsCtrl as nc')
       .alert(role='alert' ng-repeat='notif in nc.notifs' ng-class='"alert-" + notif.type')
-        button.close(type='button' aria-label='Close' ng-click='notif.dismiss()')
+        button.close(type='button' aria-label='Close' ng-click='nc.dismissNotif(notif)')
           span(aria-hidden='true') &times;
         span.msg {{ notif.msg }}
 

@@ -27,43 +27,46 @@
       this.type = type;
     }
 
-    Notif.prototype.dismiss = function() {
-      var idx = thiz.notifs.indexOf(this);
+    this.notifs = [];
+
+    this.dismissNotif = function(notif) {
+      var idx = thiz.notifs.indexOf(notif);
       // Did we already dismiss?
       if (idx === -1)
         return;
       thiz.notifs.splice(idx, 1);
-      $scope.$apply();
     };
 
-    this.notifs = [];
-
-    function addNotif(msg, type) {
+    this.addNotif = function(msg, type) {
       var notif = new Notif(msg, type);
-      thiz.notifs.unshift(notif); // TODO: figure out best notif anims
-      setTimeout(_.bind(notif.dismiss, notif), NOTIF_TIMEOUT);
-    }
+      this.notifs.unshift(notif); // TODO: figure out best notif anims
+      setTimeout(function() {
+        $scope.$apply(function() {
+          thiz.dismissNotif(notif);
+        });
+      }, NOTIF_TIMEOUT);
+    };
 
     // Client messages
     socket.on('connect', function() {
-      addNotif('Connected!', 'success');
+      thiz.addNotif('Connected!', 'success');
     });
     socket.on('disconnect', function() {
-      addNotif('Disconnected!', 'danger');
+      thiz.addNotif('Disconnected!', 'danger');
     });
 
     // Server messages
     socket.on('notif:success', function(info) {
-      addNotif(info, 'success');
+      thiz.addNotif(info, 'success');
     });
     socket.on('notif:info', function(info) {
-      addNotif(info, 'info');
+      thiz.addNotif(info, 'info');
     });
     socket.on('notif:warning', function(warning) {
-      addNotif(warning, 'warning');
+      thiz.addNotif(warning, 'warning');
     });
     socket.on('notif:danger', function(err) {
-      addNotif(err, 'danger');
+      thiz.addNotif(err, 'danger');
     });
   }]);
 
