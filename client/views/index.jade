@@ -4,6 +4,7 @@ block content
   h1=title
   p Make a room!
   form#make-room.form-inline(action="/api/rooms" method="post")
-    fieldset.vertically-pad
+    .input-group
       input.form-control(type="text" name="name" placeholder="Room name")
-      button.btn.btn-primary(type="submit") Create
+      span.input-group-btn
+        button.btn.btn-primary(type="submit") Create
