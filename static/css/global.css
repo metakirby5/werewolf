@@ -1,1 +1,1 @@
-body,html{height:100%}.container{padding-bottom:20px}
+include 'mixins',body,html{height:100%}.container{padding-bottom:20px}

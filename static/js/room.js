@@ -2,6 +2,8 @@
 
   'use strict';
 
+  var NOTIF_TIMEOUT = 5000;
+
   // TODO: tighter integration between angularjs and socket.io (http://www.html5rocks.com/en/tutorials/frameworks/angular-websockets/)
   // TODO: let mod set room name
 
@@ -9,63 +11,98 @@
   var setTab, toggleTab;
 
   // Socket variables
-  var socket = io.connect();
+  var ws = io.connect();
   var user;
 
   // Angular stuff
-  var app = angular.module('gameRoomApp', []);
+  var app = angular.module('gameRoomApp', ['ngAnimate', 'socketioService']);
+
+  // Notification messages
+  app.controller('notifsCtrl', ['$scope', 'socket', function($scope, socket) {
+    var thiz = this;
+    socket.set(ws);
+
+    function Notif(msg, type) {
+      this.msg = msg;
+      this.type = type;
+    }
+
+    Notif.prototype.dismiss = function() {
+      thiz.notifs.splice(thiz.notifs.indexOf(this), 1);
+      $scope.$apply();
+    };
+
+    this.notifs = [];
+
+    function addNotif(msg, type) {
+      var notif = new Notif(msg, type);
+      thiz.notifs.unshift(notif); // TODO: figure out best notif anims
+      setTimeout(notif.dismiss, NOTIF_TIMEOUT);
+    }
+
+    // Client messages
+    socket.on('connect', function() {
+      addNotif('Connected!', 'success');
+    });
+    socket.on('disconnect', function() {
+      addNotif('Disconnected!', 'danger');
+    });
+
+    // Server messages
+    socket.on('notif:success', function(info) {
+      addNotif(info, 'success');
+    });
+    socket.on('notif:info', function(info) {
+      addNotif(info, 'info');
+    });
+    socket.on('notif:warning', function(warning) {
+      addNotif(warning, 'warning');
+    });
+    socket.on('notif:err', function(err) {
+      addNotif(err, 'danger');
+    });
+  }]);
 
   // Tabs
-  app.controller('tabsCtrl', function() {
+  app.controller('tabsCtrl', ['socket', function(socket) {
     var thiz = this;
+    socket.set(ws);
 
-    thiz.tabs = [{name: 'Dashboard', enabled: true}, {name: 'Game', enabled: true}];
-    thiz.active = thiz.tabs[0].name;
+    // TODO: make tabs objects
+    this.tabs = [{name: 'Dashboard', enabled: true}, {name: 'Game', enabled: true}];
+    this.active = this.tabs[0].name;
 
-    thiz.setTab = setTab = function(tab) { thiz.active = tab.name; };
-    thiz.isActive  = function(tab) { return tab.name === thiz.active; };
-    thiz.dashActive = function() { return thiz.isActive({name: 'Dashboard'}); };
+    this.setTab = setTab = function(tab) { thiz.active = tab.name; };
+    this.isActive  = function(tab) { return tab.name === thiz.active; };
+    this.dashActive = function() { return thiz.isActive({name: 'Dashboard'}); };
 
     toggleTab = function(tab, enable) { thiz.tabs[tab].enabled = enable; };
-  });
+  }]);
 
   // Dashboard
-  app.controller('dashCtrl', function() {
+  app.controller('dashCtrl', ['socket', function(socket) {
+    socket.set(ws);
+
     this.username = '';
+  }]);
+
+  ws.on('connect', function() {
+    ws.emit('room:join', $ww.id);
   });
 
-  socket.on('connect', function() {
-    console.log('connected - joining ' + $ww.id);
-    socket.emit('room:join', $ww.id);
+  ws.on('room:joined', function() {
+    ws.emit('user:get', $.cookie('userId'));
   });
 
-  socket.on('errMsg', function(e) {
-    alert('ERROR: ' + e); // TODO: turn this into a bootstrap modal
-  });
-
-  socket.on('room:joined', function() {
-    console.log('joined room - adding user ' + $.cookie('userId'));
-    socket.emit('user:get', $.cookie('userId'));
-  });
-
-  socket.on('room:notFound', function() {
-    console.log('room closed');
-  });
-
-  socket.on('user:notFound', function() {
-    console.log('user not found, prompting for info...');
+  ws.on('user:notFound', function() {
     var name = 'NAME'; // TODO: get this from frontend
-    socket.emit('user:add', {userId: $.cookie('userId'), name: name});
+    ws.emit('user:add', {userId: $.cookie('userId'), name: name});
   });
 
-  socket.on('user:found', function(iUser) {
+  ws.on('user:found', function(foundUser) {
     console.log('found user');
-    console.log(iUser);
-    user = iUser;
-  });
-
-  socket.on('room:full', function() {
-    console.log('room full')
+    console.log(foundUser);
+    user = foundUser;
   });
 
 })(window.$ww, window.jQuery, window._, window.angular, window.io);

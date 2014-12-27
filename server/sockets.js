@@ -23,7 +23,7 @@ module.exports = function(io) {
         socket.emit('room:joined');
       } else {
         console.log('roomId ' + roomId + ' not found, aborting');
-        socket.emit('room:notFound');
+        socket.emit('notif:err', 'Room not found!');
       }
     });
 
@@ -39,6 +39,7 @@ module.exports = function(io) {
       var parsedId = parseSignedCookie(userId);
       if (!parsedId) {
         console.log('cookie ' + userId + ' was invalid!');
+        socket.emit('notif:err', 'Please clear your cookies.');
         return;
       }
 
@@ -48,18 +49,20 @@ module.exports = function(io) {
         console.log('found user');
         console.log(user.repr());
         socket.emit('user:found', user.repr());
+        socket.emit('notif:success', 'Rejoined room as ' + user.getName() + '!');
       } else {
         console.log('user not found, requesting info');
+        socket.emit('notif:warning', 'Please enter your username.');
         socket.emit('user:notFound');
       }
     });
 
     socket.on('user:add', function(data) {
       // Safety checks
-      if (!data)
+      if (!data || !('userId' in data && 'name' in data)) {
+        socket.emit('notif:err', 'Oops! Please try again.');
         return;
-      if (!('userId' in data && 'name' in data))
-        return;
+      }
 
       var userId = data.userId,
           name = data.name;
@@ -68,6 +71,7 @@ module.exports = function(io) {
       var parsedId = parseSignedCookie(userId);
       if (!parsedId) {
         console.log('cookie ' + userId + ' was invalid!');
+        socket.emit('notif:err', 'Please clear your cookies.');
         return;
       }
 
@@ -78,9 +82,10 @@ module.exports = function(io) {
         console.log(user.repr());
         console.log(room.getUserCount() + ' users now in room ' + room.getName());
         socket.emit('user:found', user.repr());
+        socket.emit('notif:success', 'Added ' + name + ' to the room!');
       } catch (e) {
         console.log(e);
-        socket.emit('errMsg', e);
+        socket.emit('notif:err', e);
       }
     });
   });

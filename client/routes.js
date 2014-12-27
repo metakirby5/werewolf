@@ -30,7 +30,7 @@ router.
     res.render('room', {
       title: 'Werewolf',
       css: ['room'],
-      js: ['room'],
+      js: ['services', 'room'],
       ngApp: 'gameRoomApp',
       room: room.getName(),
       extra: room.repr()

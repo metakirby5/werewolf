@@ -37,6 +37,22 @@ var User = function(id, socket, name, card, state) {
   };
 
   /**
+   * Getter for name.
+   * @returns name
+   */
+  this.getName = function() {
+    return _name;
+  };
+
+  /**
+   * Setter for name.
+   * @param name  The name to set to.
+   */
+  this.setName = function(name) {
+    _name = name;
+  };
+
+  /**
    * Getter for id.
    * @returns id
    */
