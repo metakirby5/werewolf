@@ -73,16 +73,14 @@ module.exports = function(io) {
 
       console.log('adding user ' + parsedId + ': ' + name);
       user = new User(parsedId, socket, name);
-      var success = room.addUser(user);
-
-      // Return the user
-      if (success) {
+      try {
+        room.addUser(user);
         console.log(user.repr());
         console.log(room.getUserCount() + ' users now in room ' + room.getName());
         socket.emit('user:found', user.repr());
-      } else {
-        console.log('room was full');
-        socket.emit('room:full');
+      } catch (e) {
+        console.log(e);
+        socket.emit('errMsg', e);
       }
     });
   });

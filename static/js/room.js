@@ -2,6 +2,9 @@
 
   'use strict';
 
+  // TODO: tighter integration between angularjs and socket.io (http://www.html5rocks.com/en/tutorials/frameworks/angular-websockets/)
+  // TODO: let mod set room name
+
   // Angular variables
   var setTab, toggleTab;
 
@@ -34,6 +37,10 @@
   socket.on('connect', function() {
     console.log('connected - joining ' + $ww.id);
     socket.emit('room:join', $ww.id);
+  });
+
+  socket.on('errMsg', function(e) {
+    alert('ERROR: ' + e); // TODO: turn this into a bootstrap modal
   });
 
   socket.on('room:joined', function() {

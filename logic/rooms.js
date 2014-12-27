@@ -17,6 +17,7 @@ var Room = function(id, name, pub, maxUsers) {
   var _pub = pub !== undefined ? pub : true;                // public by default
   var _maxUsers = maxUsers !== undefined ? maxUsers : -1;   // no max by default
   var _users = {};
+  var _usernames = {};
 
   this.game = 'TEMP';
 
@@ -109,15 +110,19 @@ var Room = function(id, name, pub, maxUsers) {
 
   /**
    * Adds a user to the room, if possible
-   * @param   user
-   * @returns Success or failure
+   * @param           user
    */
   this.addUser = function(user) {
-    if (_maxUsers === -1 || this.getUserCount() < _maxUsers) {
-      _users[user.getId()] = user;
-      return true;
-    } else
-      return false;
+    // Did we cap out on users?
+    if (!(_maxUsers === -1 || this.getUserCount() < _maxUsers))
+      throw 'Too many users.';
+
+    // Do we have a unique username?
+    if (user.name in _usernames)
+      throw 'Duplicate username.';
+
+    _users[user.getId()] = user;
+    _usernames[user.name] = true;
   };
 
   /**
