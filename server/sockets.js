@@ -11,8 +11,17 @@ module.exports = function(io) {
     var room, user;
 
     socket.on('disconnect', function() {
-      // TODO: if mod d/cs, end the game and delete the room
-      console.log('disconnected');
+      if (user && room) {
+        if (user.isMod()) {
+          console.log('mod \'' + user.getName() + '\' has disconnected');
+          console.log('ending game and deleting room');
+          rooms.deleteRoom(room.getId());
+        }
+        else {
+          console.log('player \'' + user.getName() + '\' has disconnected');
+          // TODO: game pause logic
+        }
+      }
     });
 
     socket.on('room:join', function(roomId) {
@@ -72,7 +81,7 @@ module.exports = function(io) {
       }
 
       console.log('adding user ' + parsedId + ': ' + name);
-      user = new User(parsedId, socket, name);
+      user = new User(parsedId, socket, name, room.getUserCount() === 0);
       try {
         room.addUser(user);
         console.log(user.repr());

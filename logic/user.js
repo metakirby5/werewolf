@@ -9,10 +9,11 @@ var uuid = require('node-uuid');
  * @param id      (optional) The user's id
  * @constructor
  */
-var User = function(id, socket, name, card, state) {
+var User = function(id, socket, name, isMod, card, state) {
   var _id = id ? id : uuid.v4();
   var _socket = socket ? socket : null;
   var _name = name ? name : 'Noname';
+  var _isMod = isMod ? isMod : false;
   var _card = card ? card : 'villager';
 
   // Public state, because it needs to be easily mutable
@@ -31,6 +32,7 @@ var User = function(id, socket, name, card, state) {
     return {
       id: _id,
       name: _name,
+      isMod: _isMod,
       card: _card,
       state: this.state
     };
@@ -43,6 +45,22 @@ var User = function(id, socket, name, card, state) {
   this.getId = function() {
     return _id;
   };
+
+  /**
+   * Getter for name.
+   * @returns user name
+   */
+  this.getName = function() {
+    return _name;
+  }
+
+  /**
+   * Check if this user is a mod.
+   * @returns true if user is a mod, false otherwise
+   */
+  this.isMod = function() {
+    return _isMod;
+  }
 
   /**
    * Sets the user's socket.

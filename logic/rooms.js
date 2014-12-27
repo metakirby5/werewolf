@@ -118,11 +118,11 @@ var Room = function(id, name, pub, maxUsers) {
       throw 'Too many users.';
 
     // Do we have a unique username?
-    if (user.name in _usernames)
-      throw 'Duplicate username.';
+    if (user.getName() in _usernames)
+      throw 'Duplicate username: ' + user.getName();
 
     _users[user.getId()] = user;
-    _usernames[user.name] = true;
+    _usernames[user.getName()] = true;
   };
 
   /**
