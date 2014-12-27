@@ -54,7 +54,7 @@ module.exports = function(io) {
       }
     });
 
-    socket.on('user;add', function(data) {
+    socket.on('user:add', function(data) {
       // Safety checks
       if (!data)
         return;
