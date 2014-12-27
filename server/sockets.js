@@ -12,11 +12,15 @@ module.exports = function(io) {
 
     socket.on('disconnect', function() {
       if (user && room) {
+
+        // Mod disconnected - end game, delete room
         if (user.isMod()) {
           console.log('mod \'' + user.getName() + '\' has disconnected');
           console.log('ending game and deleting room');
           rooms.deleteRoom(room.getId());
         }
+
+        // Player disconnected - pause game
         else {
           console.log('player \'' + user.getName() + '\' has disconnected');
           // TODO: game pause logic

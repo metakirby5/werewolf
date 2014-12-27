@@ -4,6 +4,7 @@ var uuid = require('node-uuid');
  * Represents a user. Basically a wrapper over a socket.
  * @param socket  The socket of the user
  * @param name    The user's name
+ * @param isMod   Whether the user is a mod
  * @param card    The user's card
  * @param state   The user's state
  * @param id      (optional) The user's id
@@ -26,7 +27,7 @@ var User = function(id, socket, name, isMod, card, state) {
 
   /**
    * Returns a JSON representation of user
-   * @returns {{id: *, name: *, card: *, state: *}} representation
+   * @returns {{id: *, name: *, isMod: *, card: *, state: *}} representation
    */
   this.repr = function() {
     return {
