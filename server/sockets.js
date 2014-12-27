@@ -14,7 +14,7 @@ module.exports = function(io) {
       if (user && room) {
 
         // Mod disconnected - end game, delete room
-        if (user.isMod()) {
+        if (user.getId() === room.getMod().getId()) {
           console.log('mod \'' + user.getName() + '\' has disconnected');
           console.log('ending game and deleting room');
           rooms.deleteRoom(room.getId());
@@ -85,7 +85,7 @@ module.exports = function(io) {
       }
 
       console.log('adding user ' + parsedId + ': ' + name);
-      user = new User(parsedId, socket, name, room.getUserCount() === 0);
+      user = new User(parsedId, socket, name);
       try {
         room.addUser(user);
         console.log(user.repr());

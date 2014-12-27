@@ -4,17 +4,15 @@ var uuid = require('node-uuid');
  * Represents a user. Basically a wrapper over a socket.
  * @param socket  The socket of the user
  * @param name    The user's name
- * @param isMod   Whether the user is a mod
  * @param card    The user's card
  * @param state   The user's state
  * @param id      (optional) The user's id
  * @constructor
  */
-var User = function(id, socket, name, isMod, card, state) {
+var User = function(id, socket, name, card, state) {
   var _id = id ? id : uuid.v4();
   var _socket = socket ? socket : null;
   var _name = name ? name : 'Noname';
-  var _isMod = isMod ? isMod : false;
   var _card = card ? card : 'villager';
 
   // Public state, because it needs to be easily mutable
@@ -27,13 +25,12 @@ var User = function(id, socket, name, isMod, card, state) {
 
   /**
    * Returns a JSON representation of user
-   * @returns {{id: *, name: *, isMod: *, card: *, state: *}} representation
+   * @returns {{id: *, name: *, card: *, state: *}} representation
    */
   this.repr = function() {
     return {
       id: _id,
       name: _name,
-      isMod: _isMod,
       card: _card,
       state: this.state
     };
@@ -53,14 +50,6 @@ var User = function(id, socket, name, isMod, card, state) {
    */
   this.getName = function() {
     return _name;
-  }
-
-  /**
-   * Check if this user is a mod.
-   * @returns true if user is a mod, false otherwise
-   */
-  this.isMod = function() {
-    return _isMod;
   }
 
   /**
