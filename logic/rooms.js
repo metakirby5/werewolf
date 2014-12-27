@@ -152,6 +152,30 @@ var Room = function(id, name, pub, maxUsers) {
   this.setMod = function(user) {
     _mod = user;
   }
+
+  /**
+   * Gets a list of all connected users in this room.
+   * @return list of all connected users
+   */
+  this.getConnectedUsers = function() {
+    var connectedUsers = [];
+    for (var user in _users)
+      if (_users[user].isConnected())
+        connectedUsers.push(_users[user]);
+    return connectedUsers;
+  }
+
+  /**
+   * "Randomly" gets the next connected user to be the new mod.
+   * @return the user to set as mod, null if no user available
+   */
+  this.getNextMod = function(oldMod) {
+    var list = this.getConnectedUsers();
+    for (var idx = 0; idx < list.length; idx++)
+      if (list[idx].getId() !== oldMod.getId())
+        return list[idx];
+    return null;
+  }
 };
 
 /**

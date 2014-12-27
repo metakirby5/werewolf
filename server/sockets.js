@@ -13,11 +13,22 @@ module.exports = function(io) {
     socket.on('disconnect', function() {
       if (user && room) {
 
-        // Mod disconnected - end game, delete room
+        // Mod has disconnected
         if (user.getId() === room.getMod().getId()) {
           console.log('mod \'' + user.getName() + '\' has disconnected');
-          console.log('ending game and deleting room');
-          rooms.deleteRoom(room.getId());
+          var nextMod = room.getNextMod(user);
+
+          // Another connected player available? Assign new mod
+          if (nextMod) {
+            console.log('new mod assigned: ' + nextMod.getName());
+            room.setMod(nextMod);
+          }
+
+          // No available mod - end the game, destroy the room
+          else {
+            console.log('no mods available - ending game and deleting room');
+            rooms.deleteRoom(room.getId());
+          }
         }
 
         // Player disconnected - pause game
