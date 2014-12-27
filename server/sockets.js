@@ -60,6 +60,7 @@ module.exports = function(io) {
       if (user) {
         console.log('found user');
         console.log(user.repr());
+        user.setSocket(socket);
         socket.emit('user:found', user.repr());
       } else {
         console.log('user not found, requesting info');
