@@ -1,3 +1,5 @@
+"use strict";
+
 var shortId = require('shortid');
 
 var TIMEOUT = 5000; // ms

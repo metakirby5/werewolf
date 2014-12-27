@@ -1,3 +1,5 @@
+"use strict";
+
 var cookieParser = require('cookie-parser');
 var secret = process.env.COOKIE_SECRET;
 var rooms = require('../logic/rooms');
