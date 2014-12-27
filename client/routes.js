@@ -31,6 +31,7 @@ router.
       title: 'Werewolf',
       css: ['room'],
       js: ['room'],
+      ngApp: 'gameRoomApp',
       room: room.getName(),
       extra: room.repr()
     });

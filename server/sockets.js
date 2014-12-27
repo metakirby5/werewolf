@@ -15,15 +15,15 @@ module.exports = function(io) {
       console.log('disconnected');
     });
 
-    socket.on('joinRoom', function(roomId) {
+    socket.on('room:join', function(roomId) {
       room = rooms.getRoom(roomId);
       if (room) {
         socket.join(roomId);
         console.log('socket ' + socket.id + ' joined channel ' + roomId + ': ' + room.getName());
-        socket.emit('joinedRoom');
+        socket.emit('room:joined');
       } else {
         console.log('roomId ' + roomId + ' not found, aborting');
-        socket.emit('roomNotFound');
+        socket.emit('room:notFound');
       }
     });
 
@@ -35,7 +35,7 @@ module.exports = function(io) {
       return parsed;
     }
 
-    socket.on('getUser', function(userId) {
+    socket.on('user:get', function(userId) {
       var parsedId = parseSignedCookie(userId);
       if (!parsedId) {
         console.log('cookie ' + userId + ' was invalid!');
@@ -47,14 +47,14 @@ module.exports = function(io) {
       if (user) {
         console.log('found user');
         console.log(user.repr());
-        socket.emit('foundUser', user.repr());
+        socket.emit('user:found', user.repr());
       } else {
         console.log('user not found, requesting info');
-        socket.emit('userNotFound');
+        socket.emit('user:notFound');
       }
     });
 
-    socket.on('addUser', function(data) {
+    socket.on('user;add', function(data) {
       // Safety checks
       if (!data)
         return;
@@ -79,10 +79,10 @@ module.exports = function(io) {
       if (success) {
         console.log(user.repr());
         console.log(room.getUserCount() + ' users now in room ' + room.getName());
-        socket.emit('foundUser', user.repr());
+        socket.emit('user:found', user.repr());
       } else {
         console.log('room was full');
-        socket.emit('roomFull');
+        socket.emit('room:full');
       }
     });
   });

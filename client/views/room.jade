@@ -1,5 +1,14 @@
 extends global/base
 
 block content
-  p welcome to #{room}
+  h1= room
+  div(ng-controller='tabsCtrl as tc')
+    ul.tab-bar.nav.nav-tabs
+      li(ng-repeat='tab in tc.tabs' ng-class='{active: tc.isActive(tab), disabled: !tab.enabled}' ng-click='tc.setTab(tab)')
+        a {{ tab.name }}
 
+    .dash(ng-controller='dashCtrl as dc' ng-show='tc.dashActive()' ng-cloak)
+      .input-group
+        input.form-control(type='text' placeholder='Username' ng-model='dc.username')
+        span.input-group-btn
+          button.btn.btn-primary(type='button') Set Username

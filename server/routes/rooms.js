@@ -22,6 +22,9 @@ router.route('/').
     var maxUsers = body['maxUsers'];
 
     // Error checking and casting
+    if (name === '')
+      name = undefined;
+
     if (pub !== undefined) {
       pub = util.boolOrUndefined(pub);
       if (pub === undefined)
