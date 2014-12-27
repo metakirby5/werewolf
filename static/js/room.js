@@ -75,13 +75,17 @@
     var thiz = this;
     socket.set(ws);
 
-    // TODO: make tabs objects
-    this.tabs = [{name: 'Dashboard', enabled: true}, {name: 'Game', enabled: true}];
+    function Tab(name) {
+      this.name = name;
+      this.enabled = true;
+    }
+
+    this.tabs = [new Tab('Dashboard'), new Tab('Game')];
     this.active = this.tabs[0].name;
 
     this.setTab = setTab = function(tab) { thiz.active = tab.name; };
     this.isActive  = function(tab) { return tab.name === thiz.active; };
-    this.dashActive = function() { return thiz.isActive({name: 'Dashboard'}); };
+    this.dashActive = function() { return thiz.isActive(this.tabs[0]); };
 
     toggleTab = function(tab, enable) { thiz.tabs[tab].enabled = enable; };
   }]);
