@@ -54,7 +54,7 @@
 
   socket.on('user:notFound', function() {
     console.log('user not found, prompting for info...');
-    var name = 'NAME'; // TODO: get this from frontend
+    var name = prompt("Name?", ""); // TODO: better name prompting
     socket.emit('user:add', {userId: $.cookie('userId'), name: name});
   });
 

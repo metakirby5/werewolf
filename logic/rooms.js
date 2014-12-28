@@ -1,4 +1,7 @@
+"use strict";
+
 var shortId = require('shortid');
+var _ = require('lodash');
 
 var TIMEOUT = 5000; // ms
 var rooms = {};
@@ -18,6 +21,8 @@ var Room = function(id, name, pub, maxUsers) {
   var _maxUsers = maxUsers !== undefined ? maxUsers : -1;   // no max by default
   var _users = {};
   var _usernames = {};
+  var _connectedUsers = {};
+  var _mod = null;
 
   this.game = 'TEMP';
 
@@ -118,11 +123,14 @@ var Room = function(id, name, pub, maxUsers) {
       throw 'Too many users.';
 
     // Do we have a unique username?
-    if (user.name in _usernames)
-      throw 'Duplicate username.';
+    if (user.getName() in _usernames)
+      throw 'Duplicate username: ' + user.getName();
+
+    if (this.getUserCount() === 0)
+      _mod = user;
 
     _users[user.getId()] = user;
-    _usernames[user.name] = true;
+    _usernames[user.getName()] = true;
   };
 
   /**
@@ -131,6 +139,47 @@ var Room = function(id, name, pub, maxUsers) {
    */
   this.removeUser = function(userId) {
     delete _users[userId];
+  }
+
+  /**
+   * Registers this user as connected by adding them to the list of
+   * connected users.
+   * @param the connected user
+   */
+  this.userConnected = function(user) {
+    _connectedUsers[user.getId()] = user;
+  }
+
+  /**
+   * Deregisters this user from the connected list by removing them.
+   * @param the disconnected user
+   */
+  this.userDisconnected = function(user) {
+    delete _connectedUsers[user.getId()];
+  }
+
+  /**
+   * Gets mod of this room
+   * @returns   The user if exists, null otherwise
+   */
+  this.getMod = function() {
+    return _mod;
+  }
+
+  /**
+   * Sets the mod of this room
+   * @param   The user to set as mod of this room
+   */
+  this.setMod = function(user) {
+    _mod = user;
+  }
+
+  /**
+   * Randomly gets a connected user to be the new mod.
+   * @return  the user to set as mod, null if no user available
+   */
+  this.getNextMod = function() {
+    return _.sample(_connectedUsers);
   }
 };
 
