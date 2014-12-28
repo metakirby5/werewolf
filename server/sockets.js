@@ -150,6 +150,15 @@ module.exports = function(io) {
 
       // Set new name for user
       var oldName = user.getName();
+      try {
+        room.setUserName(user, name);
+      } catch (e) {
+        console.log(e);
+        socket.emit('notif:danger', e);
+        return;
+      }
+
+      // Update local
       user.setName(name);
       console.log('"' + oldName + '" changed name to "' + name + '"');
       socket.emit('notif:success', 'Changed name from "' + oldName + '" to "' + name + '"!');
