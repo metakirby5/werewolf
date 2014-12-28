@@ -37,6 +37,8 @@ module.exports = function(io) {
       return parsed;
     }
 
+    // TODO: make sure these events are only triggered if we have a room!
+
     socket.on('user:get', function(userId) {
       var parsedId = parseSignedCookie(userId);
       if (!parsedId) {
@@ -59,6 +61,7 @@ module.exports = function(io) {
       }
     });
 
+    // TODO: check if username empty
     socket.on('user:add', function(data) {
       // Safety checks
       if (!data || !('userId' in data && 'name' in data)) {

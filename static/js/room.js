@@ -4,7 +4,7 @@
 
   var NOTIF_TIMEOUT = 5000;
 
-  // TODO: tighter integration between angularjs and socket.io (http://www.html5rocks.com/en/tutorials/frameworks/angular-websockets/)
+  // TODO: turn elements into directives
   // TODO: let mod set room name
 
   // Angular variables
@@ -71,7 +71,7 @@
   }]);
 
   // Tabs
-  app.controller('tabsCtrl', ['socket', function(socket) {
+  app.controller('tabsCtrl', ['$scope', 'socket', function($scope, socket) {
     var thiz = this;
     socket.set(ws);
 
@@ -83,18 +83,53 @@
     this.tabs = [new Tab('Dashboard'), new Tab('Game')];
     this.active = this.tabs[0].name;
 
-    this.setTab = setTab = function(tab) { thiz.active = tab.name; };
-    this.isActive  = function(tab) { return tab.name === thiz.active; };
-    this.dashActive = function() { return thiz.isActive(this.tabs[0]); };
+    this.setTab = setTab = function(tabName) { thiz.active = tabName; };
+    this.isActive  = function(tabName) { return tabName === thiz.active; };
+    this.dashActive = function() { return thiz.isActive('Dashboard'); };
 
-    toggleTab = function(tab, enable) { thiz.tabs[tab].enabled = enable; };
+    toggleTab = function(tabName, enable) {
+      thiz.tabs.forEach(function(t) {
+        if (t.name === tabName)
+          t.enabled = enable;
+      });
+    };
+
+    ws.on('user:notFound', function() {
+      $scope.$apply(function() {
+        setTab('Dashboard');
+        toggleTab('Game', false);
+      });
+    });
+
+    ws.on('user:found', function() {
+      $scope.$apply(function() {
+        setTab('Game');
+        toggleTab('Game', true);
+      });
+    })
   }]);
 
   // Dashboard
   app.controller('dashCtrl', ['socket', function(socket) {
+    var thiz = this;
     socket.set(ws);
 
+    this.hasUser = false;
     this.username = '';
+
+    this.submitUsername = function() {
+      // TODO: validate username is not empty
+      // TODO: add setName event
+      socket.emit(thiz.hasUser ? 'user:setName' : 'user:add', {userId: $.cookie('userId'), name: thiz.username});
+    };
+
+    ws.on('user:notFound', function() {
+      thiz.hasUser = false;
+    });
+
+    ws.on('user:found', function() {
+      thiz.hasUser = true;
+    });
   }]);
 
   ws.on('connect', function() {
@@ -103,11 +138,6 @@
 
   ws.on('room:joined', function() {
     ws.emit('user:get', $.cookie('userId'));
-  });
-
-  ws.on('user:notFound', function() {
-    var name = 'NAME'; // TODO: get this from frontend
-    ws.emit('user:add', {userId: $.cookie('userId'), name: name});
   });
 
   ws.on('user:found', function(foundUser) {

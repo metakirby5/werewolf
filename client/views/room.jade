@@ -10,11 +10,12 @@ block content
         span.msg {{ notif.msg }}
 
     ul.tab-bar.nav.nav-tabs
-      li(ng-repeat='tab in tc.tabs' ng-class='{active: tc.isActive(tab), disabled: !tab.enabled}' ng-click='tc.setTab(tab)')
+      li(ng-repeat='tab in tc.tabs' ng-class='{active: tc.isActive(tab.name), disabled: !tab.enabled}'
+         ng-disabled='!tab.enabled' ng-click='tab.enabled && tc.setTab(tab.name)')
         a {{ tab.name }}
 
     .dash(ng-controller='dashCtrl as dc' ng-show='tc.dashActive()' ng-cloak)
       .input-group
         input.form-control(type='text' placeholder='Username' ng-model='dc.username')
         span.input-group-btn
-          button.btn.btn-primary(type='button') Set Username
+          button.btn(type='button' ng-class='dc.hasUser ? "btn-success" : "btn-primary"' ng-click='dc.submitUsername()') Set Username
