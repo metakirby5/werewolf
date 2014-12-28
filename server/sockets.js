@@ -15,6 +15,8 @@ module.exports = function(io) {
     socket.on('disconnect', function() {
       if (user && room) {
 
+        room.userDisconnected(user);
+
         // Mod has disconnected
         if (user.getId() === room.getMod().getId()) {
           console.log('mod \'' + user.getName() + '\' has disconnected');
@@ -74,6 +76,7 @@ module.exports = function(io) {
         console.log('found user');
         console.log(user.repr());
         user.setSocket(socket);
+        room.userConnected(user);
         socket.emit('user:found', user.repr());
       } else {
         console.log('user not found, requesting info');
@@ -102,6 +105,7 @@ module.exports = function(io) {
       user = new User(parsedId, socket, name);
       try {
         room.addUser(user);
+        room.userConnected(user);
         console.log(user.repr());
         console.log(room.getUserCount() + ' users now in room ' + room.getName());
         socket.emit('user:found', user.repr());

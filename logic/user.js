@@ -16,7 +16,6 @@ var User = function(id, socket, name, card, state) {
   var _socket = socket ? socket : null;
   var _name = name ? name : 'Noname';
   var _card = card ? card : 'villager';
-  var _connected = true;
 
   // Public state, because it needs to be easily mutable
   this.state = state ? state : {};
@@ -24,7 +23,6 @@ var User = function(id, socket, name, card, state) {
   // On disconnect, deregister this socket
   _socket.on('disconnect', function() {
     _socket = null;
-    _connected = false;
   });
 
   /**
@@ -57,23 +55,13 @@ var User = function(id, socket, name, card, state) {
   }
 
   /**
-   * Checks whether this user is connected.
-   * @returns true if connected, false otherwise
-   */
-  this.isConnected = function() {
-    return _connected;
-  }
-
-  /**
    * Sets the user's socket.
    * @param socket  The socket to set to
    */
   this.setSocket = function(socket) {
     _socket = socket;
-    _connected = true;
     _socket.on('disconnect', function() {
       _socket = null;
-      _connected = false;
     });
   };
 

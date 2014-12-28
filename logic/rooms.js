@@ -20,6 +20,7 @@ var Room = function(id, name, pub, maxUsers) {
   var _maxUsers = maxUsers !== undefined ? maxUsers : -1;   // no max by default
   var _users = {};
   var _usernames = {};
+  var _connectedUsers = {};
   var _mod = null;
 
   this.game = 'TEMP';
@@ -140,6 +141,23 @@ var Room = function(id, name, pub, maxUsers) {
   }
 
   /**
+   * Registers this user as connected by adding them to the list of
+   * connected users.
+   * @param the connected user
+   */
+  this.userConnected = function(user) {
+    _connectedUsers[user.getId()] = user;
+  }
+
+  /**
+   * Deregisters this user from the connected list by removing them.
+   * @param the disconnected user
+   */
+  this.userDisconnected = function(user) {
+    delete _connectedUsers[user.getId()];
+  }
+
+  /**
    * Gets mod of this room
    * @returns   The user if exists, null otherwise
    */
@@ -156,27 +174,17 @@ var Room = function(id, name, pub, maxUsers) {
   }
 
   /**
-   * Gets a list of all connected users in this room.
-   * @return list of all connected users
+   * Randomly gets a connected user to be the new mod.
+   * http://stackoverflow.com/a/2532251/2014825
+   * @return  the user to set as mod, null if no user available
    */
-  this.getConnectedUsers = function() {
-    var connectedUsers = [];
-    for (var user in _users)
-      if (_users[user].isConnected())
-        connectedUsers.push(_users[user]);
-    return connectedUsers;
-  }
-
-  /**
-   * "Randomly" gets the next connected user to be the new mod.
-   * @return the user to set as mod, null if no user available
-   */
-  this.getNextMod = function(oldMod) {
-    var list = this.getConnectedUsers();
-    for (var idx = 0; idx < list.length; idx++)
-      if (list[idx].getId() !== oldMod.getId())
-        return list[idx];
-    return null;
+  this.getNextMod = function() {
+    var mod = null;
+    var count = 0;
+    for (var user in _connectedUsers)
+      if (Math.random() < 1 / ++count)
+        mod = _connectedUsers[user];
+    return mod;
   }
 };
 
