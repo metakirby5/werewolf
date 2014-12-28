@@ -7,8 +7,8 @@
   // TODO: turn elements into directives
   // TODO: let mod set room name
 
-  // Angular variables
-  var setTab, toggleTab;
+  // Event passer-arounder
+  var ee = new EventEmitter();
 
   // Socket variables
   var ws = io.connect();
@@ -83,27 +83,30 @@
     this.tabs = [new Tab('Dashboard'), new Tab('Game')];
     this.active = this.tabs[0].name;
 
-    this.setTab = setTab = function(tabName) { thiz.active = tabName; };
+    this.setTab = function(tabName) {
+      ee.emit('tabChange', this.active, tabName);
+      thiz.active = tabName;
+    };
     this.isActive  = function(tabName) { return tabName === thiz.active; };
     this.dashActive = function() { return thiz.isActive('Dashboard'); };
 
-    toggleTab = function(tabName, enable) {
+    function toggleTab(tabName, enable) {
       thiz.tabs.forEach(function(t) {
         if (t.name === tabName)
           t.enabled = enable;
       });
-    };
+    }
 
     ws.on('user:notFound', function() {
       $scope.$apply(function() {
-        setTab('Dashboard');
+        thiz.setTab('Dashboard');
         toggleTab('Game', false);
       });
     });
 
-    ws.on('user:found', function() {
+    ws.on('user:update', function() {
       $scope.$apply(function() {
-        setTab('Game');
+        thiz.setTab('Game');
         toggleTab('Game', true);
       });
     })
@@ -117,13 +120,23 @@
     this.socketing = false;
     this.hasUser = false;
     this.username = '';
+    this.usernameChanged = function() {
+      return !user || thiz.username !== user.name;
+    };
+
+    ee.on('tabChange', function(from, to) {
+      if (from !== 'Dashboard' && to === 'Dashboard')
+        thiz.username = user ? user.name : '';
+    });
 
     this.submitUsername = function(valid) {
-      // TODO: add setName event
       if (!valid)
         return;
+      // Did the name change?
+      if (!thiz.usernameChanged())
+        return;
       socket.emit(thiz.hasUser ? 'user:setName' : 'user:add', {userId: $.cookie('userId'), name: thiz.username});
-      this.socketing = true;
+      thiz.socketing = true;
     };
 
     ws.on('user:notFound', function() {
@@ -131,7 +144,7 @@
       thiz.socketing = false;
     });
 
-    ws.on('user:found', function() {
+    ws.on('user:update', function() {
       thiz.hasUser = true;
       thiz.socketing = false;
     });
@@ -146,7 +159,7 @@
   });
 
   ws.on('user:update', function(foundUser) {
-    console.log('found user');
+    console.log('updating user');
     console.log(foundUser);
     user = foundUser;
   });
