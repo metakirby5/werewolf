@@ -145,7 +145,7 @@
     ws.emit('user:get', $.cookie('userId'));
   });
 
-  ws.on('user:found', function(foundUser) {
+  ws.on('user:update', function(foundUser) {
     console.log('found user');
     console.log(foundUser);
     user = foundUser;
