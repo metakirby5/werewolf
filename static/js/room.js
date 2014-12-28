@@ -2,70 +2,153 @@
 
   'use strict';
 
-  // TODO: tighter integration between angularjs and socket.io (http://www.html5rocks.com/en/tutorials/frameworks/angular-websockets/)
+  var NOTIF_TIMEOUT = 5000;
+
+  // TODO: turn elements into directives
   // TODO: let mod set room name
 
   // Angular variables
   var setTab, toggleTab;
 
   // Socket variables
-  var socket = io.connect();
+  var ws = io.connect();
   var user;
 
   // Angular stuff
-  var app = angular.module('gameRoomApp', []);
+  var app = angular.module('gameRoomApp', ['ngAnimate', 'socketioService']);
+
+  // Notification messages
+  app.controller('notifsCtrl', ['$scope', 'socket', function($scope, socket) {
+    var thiz = this;
+    socket.set(ws);
+
+    function Notif(msg, type) {
+      this.msg = msg;
+      this.type = type;
+    }
+
+    this.notifs = [];
+
+    this.dismissNotif = function(notif) {
+      var idx = thiz.notifs.indexOf(notif);
+      // Did we already dismiss?
+      if (idx === -1)
+        return;
+      thiz.notifs.splice(idx, 1);
+    };
+
+    this.addNotif = function(msg, type) {
+      var notif = new Notif(msg, type);
+      this.notifs.unshift(notif); // TODO: figure out best notif anims
+      setTimeout(function() {
+        $scope.$apply(function() {
+          thiz.dismissNotif(notif);
+        });
+      }, NOTIF_TIMEOUT);
+    };
+
+    // Client messages
+    socket.on('connect', function() {
+      thiz.addNotif('Connected!', 'success');
+    });
+    socket.on('disconnect', function() {
+      thiz.addNotif('Disconnected!', 'danger');
+    });
+
+    // Server messages
+    socket.on('notif:success', function(info) {
+      thiz.addNotif(info, 'success');
+    });
+    socket.on('notif:info', function(info) {
+      thiz.addNotif(info, 'info');
+    });
+    socket.on('notif:warning', function(warning) {
+      thiz.addNotif(warning, 'warning');
+    });
+    socket.on('notif:danger', function(err) {
+      thiz.addNotif(err, 'danger');
+    });
+  }]);
 
   // Tabs
-  app.controller('tabsCtrl', function() {
+  app.controller('tabsCtrl', ['$scope', 'socket', function($scope, socket) {
     var thiz = this;
+    socket.set(ws);
 
-    thiz.tabs = [{name: 'Dashboard', enabled: true}, {name: 'Game', enabled: true}];
-    thiz.active = thiz.tabs[0].name;
+    function Tab(name) {
+      this.name = name;
+      this.enabled = true;
+    }
 
-    thiz.setTab = setTab = function(tab) { thiz.active = tab.name; };
-    thiz.isActive  = function(tab) { return tab.name === thiz.active; };
-    thiz.dashActive = function() { return thiz.isActive({name: 'Dashboard'}); };
+    this.tabs = [new Tab('Dashboard'), new Tab('Game')];
+    this.active = this.tabs[0].name;
 
-    toggleTab = function(tab, enable) { thiz.tabs[tab].enabled = enable; };
-  });
+    this.setTab = setTab = function(tabName) { thiz.active = tabName; };
+    this.isActive  = function(tabName) { return tabName === thiz.active; };
+    this.dashActive = function() { return thiz.isActive('Dashboard'); };
 
-  // Dashboard
-  app.controller('dashCtrl', function() {
+    toggleTab = function(tabName, enable) {
+      thiz.tabs.forEach(function(t) {
+        if (t.name === tabName)
+          t.enabled = enable;
+      });
+    };
+
+    ws.on('user:notFound', function() {
+      $scope.$apply(function() {
+        setTab('Dashboard');
+        toggleTab('Game', false);
+      });
+    });
+
+    ws.on('user:found', function() {
+      $scope.$apply(function() {
+        setTab('Game');
+        toggleTab('Game', true);
+      });
+    })
+  }]);
+
+  // Uesrname
+  app.controller('uNameCtrl', ['socket', function(socket) {
+    var thiz = this;
+    socket.set(ws);
+
+    this.socketing = false;
+    this.hasUser = false;
     this.username = '';
+
+    this.submitUsername = function(valid) {
+      // TODO: add setName event
+      if (!valid)
+        return;
+      socket.emit(thiz.hasUser ? 'user:setName' : 'user:add', {userId: $.cookie('userId'), name: thiz.username});
+      this.socketing = true;
+    };
+
+    ws.on('user:notFound', function() {
+      thiz.hasUser = false;
+      thiz.socketing = false;
+    });
+
+    ws.on('user:found', function() {
+      thiz.hasUser = true;
+      thiz.socketing = false;
+    });
+  }]);
+
+  ws.on('connect', function() {
+    ws.emit('room:join', $ww.id);
   });
 
-  socket.on('connect', function() {
-    console.log('connected - joining ' + $ww.id);
-    socket.emit('room:join', $ww.id);
+  ws.on('room:joined', function() {
+    ws.emit('user:get', $.cookie('userId'));
   });
 
-  socket.on('errMsg', function(e) {
-    alert('ERROR: ' + e); // TODO: turn this into a bootstrap modal
-  });
-
-  socket.on('room:joined', function() {
-    console.log('joined room - adding user ' + $.cookie('userId'));
-    socket.emit('user:get', $.cookie('userId'));
-  });
-
-  socket.on('room:notFound', function() {
-    console.log('room closed');
-  });
-
-  socket.on('user:notFound', function() {
-    console.log('user not found, prompting for info...');
-    var name = prompt("Name?", ""); // TODO: better name prompting
-    socket.emit('user:add', {userId: $.cookie('userId'), name: name});
-  });
-
-  socket.on('user:found', function(iUser) {
+  ws.on('user:found', function(foundUser) {
     console.log('found user');
-    console.log(iUser);
-    user = iUser;
-  });
-
-  socket.on('room:full', function() {
-    console.log('room full')
+    console.log(foundUser);
+    user = foundUser;
   });
 
 })(window.$ww, window.jQuery, window._, window.angular, window.io);

@@ -29,6 +29,7 @@ module.exports = function(io) {
           }
 
           // No available mod - end the game, destroy the room
+          // TODO: this causes bug when two tabs w/ same user are connected, need to fix
           else {
             console.log('no mods available - ending game and deleting room');
             rooms.deleteRoom(room.getId());
@@ -51,7 +52,7 @@ module.exports = function(io) {
         socket.emit('room:joined');
       } else {
         console.log('roomId ' + roomId + ' not found, aborting');
-        socket.emit('room:notFound');
+        socket.emit('notif:danger', 'Room not found!');
       }
     });
 
@@ -63,10 +64,13 @@ module.exports = function(io) {
       return parsed;
     }
 
+    // TODO: make sure these events are only triggered if we have a room!
+
     socket.on('user:get', function(userId) {
       var parsedId = parseSignedCookie(userId);
       if (!parsedId) {
         console.log('cookie ' + userId + ' was invalid!');
+        socket.emit('notif:danger', 'Please clear your cookies.');
         return;
       }
 
@@ -78,26 +82,35 @@ module.exports = function(io) {
         user.setSocket(socket);
         room.userConnected(user);
         socket.emit('user:found', user.repr());
+        socket.emit('notif:success', 'Rejoined room as ' + user.getName() + '!');
       } else {
         console.log('user not found, requesting info');
+        socket.emit('notif:warning', 'Please enter your username.');
         socket.emit('user:notFound');
       }
     });
 
     socket.on('user:add', function(data) {
       // Safety checks
-      if (!data)
+      if (!data || !('userId' in data && 'name' in data)) {
+        socket.emit('notif:danger', 'Some data was missing - please try again.');
         return;
-      if (!('userId' in data && 'name' in data))
-        return;
+      }
 
       var userId = data.userId,
           name = data.name;
+
+      // Is name empty?
+      if (name === '') {
+        socket.emit('notif:danger', 'Username cannot be empty.');
+        return;
+      }
 
       // Try to get or add user
       var parsedId = parseSignedCookie(userId);
       if (!parsedId) {
         console.log('cookie ' + userId + ' was invalid!');
+        socket.emit('notif:danger', 'Please clear your cookies.');
         return;
       }
 
@@ -109,9 +122,10 @@ module.exports = function(io) {
         console.log(user.repr());
         console.log(room.getUserCount() + ' users now in room ' + room.getName());
         socket.emit('user:found', user.repr());
+        socket.emit('notif:success', 'Added ' + name + ' to the room!');
       } catch (e) {
         console.log(e);
-        socket.emit('errMsg', e);
+        socket.emit('notif:danger', e);
       }
     });
   });

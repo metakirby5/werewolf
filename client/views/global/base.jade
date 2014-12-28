@@ -11,7 +11,7 @@ html
       for sheet in css
         +css('/css/'+sheet+'.css')
   body
-    .container(ng-app=(ngApp ? ngApp : undefined))
+    .container(ng-app=(ngApp ? ngApp : undefined) ng-cloak=(ngApp ? true : undefined))
       block content
     if locals.extra
       // Extra variables

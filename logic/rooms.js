@@ -122,6 +122,10 @@ var Room = function(id, name, pub, maxUsers) {
     if (!(_maxUsers === -1 || this.getUserCount() < _maxUsers))
       throw 'Too many users.';
 
+    // Did we already add this user?
+    if (user.getId() in _users)
+      throw 'User already added.';
+
     // Do we have a unique username?
     if (user.getName() in _usernames)
       throw 'Duplicate username: ' + user.getName();
@@ -139,24 +143,24 @@ var Room = function(id, name, pub, maxUsers) {
    */
   this.removeUser = function(userId) {
     delete _users[userId];
-  }
+  };
 
   /**
    * Registers this user as connected by adding them to the list of
    * connected users.
-   * @param the connected user
+   * @param user The connected user
    */
   this.userConnected = function(user) {
     _connectedUsers[user.getId()] = user;
-  }
+  };
 
   /**
    * Deregisters this user from the connected list by removing them.
-   * @param the disconnected user
+   * @param user The disconnected user
    */
   this.userDisconnected = function(user) {
     delete _connectedUsers[user.getId()];
-  }
+  };
 
   /**
    * Gets mod of this room
@@ -164,15 +168,15 @@ var Room = function(id, name, pub, maxUsers) {
    */
   this.getMod = function() {
     return _mod;
-  }
+  };
 
   /**
    * Sets the mod of this room
-   * @param   The user to set as mod of this room
+   * @param user  The user to set as mod of this room
    */
   this.setMod = function(user) {
     _mod = user;
-  }
+  };
 
   /**
    * Randomly gets a connected user to be the new mod.
