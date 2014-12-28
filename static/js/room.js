@@ -39,7 +39,7 @@
 
     this.addNotif = function(msg, type) {
       var notif = new Notif(msg, type);
-      this.notifs.unshift(notif); // TODO: figure out best notif anims
+      this.notifs.unshift(notif);
       setTimeout(function() {
         $scope.$apply(function() {
           thiz.dismissNotif(notif);
@@ -119,7 +119,6 @@
     this.username = '';
 
     this.submitUsername = function(valid) {
-      // TODO: add setName event
       if (!valid)
         return;
       socket.emit(thiz.hasUser ? 'user:setName' : 'user:add', {userId: $.cookie('userId'), name: thiz.username});
