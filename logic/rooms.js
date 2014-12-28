@@ -1,6 +1,7 @@
 "use strict";
 
 var shortId = require('shortid');
+var _ = require('lodash');
 
 var TIMEOUT = 5000; // ms
 var rooms = {};
@@ -179,12 +180,7 @@ var Room = function(id, name, pub, maxUsers) {
    * @return  the user to set as mod, null if no user available
    */
   this.getNextMod = function() {
-    var mod = null;
-    var count = 0;
-    for (var user in _connectedUsers)
-      if (Math.random() < 1 / ++count)
-        mod = _connectedUsers[user];
-    return mod;
+    return _.sample(_connectedUsers);
   }
 };
 
