@@ -109,26 +109,31 @@
     })
   }]);
 
-  // Dashboard
-  app.controller('dashCtrl', ['socket', function(socket) {
+  // Uesrname
+  app.controller('uNameCtrl', ['socket', function(socket) {
     var thiz = this;
     socket.set(ws);
 
+    this.socketing = false;
     this.hasUser = false;
     this.username = '';
 
-    this.submitUsername = function() {
-      // TODO: validate username is not empty
+    this.submitUsername = function(valid) {
       // TODO: add setName event
+      if (!valid)
+        return;
       socket.emit(thiz.hasUser ? 'user:setName' : 'user:add', {userId: $.cookie('userId'), name: thiz.username});
+      this.socketing = true;
     };
 
     ws.on('user:notFound', function() {
       thiz.hasUser = false;
+      thiz.socketing = false;
     });
 
     ws.on('user:found', function() {
       thiz.hasUser = true;
+      thiz.socketing = false;
     });
   }]);
 

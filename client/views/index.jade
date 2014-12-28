@@ -3,8 +3,9 @@ extends global/base
 block content
   h1=title
   p Make a room!
-  form#make-room.form-inline(action="/api/rooms" method="post")
-    .input-group
-      input.form-control(type="text" name="name" placeholder="Room name")
-      span.input-group-btn
-        button.btn.btn-primary(type="submit") Create
+  form(action="/api/rooms" method="post")
+    .form-group
+      .input-group
+        input.form-control(type="text" name="name" placeholder="Room name")
+        span.input-group-btn
+          button.btn.btn-primary(type="submit") Create

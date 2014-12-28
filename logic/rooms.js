@@ -122,6 +122,10 @@ var Room = function(id, name, pub, maxUsers) {
     if (!(_maxUsers === -1 || this.getUserCount() < _maxUsers))
       throw 'Too many users.';
 
+    // Did we already add this user?
+    if (user.getId() in _users)
+      throw 'User already added.';
+
     // Do we have a unique username?
     if (user.getName() in _usernames)
       throw 'Duplicate username: ' + user.getName();
@@ -139,7 +143,7 @@ var Room = function(id, name, pub, maxUsers) {
    */
   this.removeUser = function(userId) {
     delete _users[userId];
-  }
+  };
 
   /**
    * Registers this user as connected by adding them to the list of

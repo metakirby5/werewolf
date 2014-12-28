@@ -29,6 +29,7 @@ module.exports = function(io) {
           }
 
           // No available mod - end the game, destroy the room
+          // TODO: this causes bug when two tabs w/ same user are connected, need to fix
           else {
             console.log('no mods available - ending game and deleting room');
             rooms.deleteRoom(room.getId());
@@ -93,12 +94,18 @@ module.exports = function(io) {
     socket.on('user:add', function(data) {
       // Safety checks
       if (!data || !('userId' in data && 'name' in data)) {
-        socket.emit('notif:danger', 'Oops! Please try again.');
+        socket.emit('notif:danger', 'Some data was missing - please try again.');
         return;
       }
 
       var userId = data.userId,
           name = data.name;
+
+      // Is name empty?
+      if (name === '') {
+        socket.emit('notif:danger', 'Username cannot be empty.');
+        return;
+      }
 
       // Try to get or add user
       var parsedId = parseSignedCookie(userId);

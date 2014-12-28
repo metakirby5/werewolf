@@ -14,8 +14,11 @@ block content
          ng-disabled='!tab.enabled' ng-click='tab.enabled && tc.setTab(tab.name)')
         a {{ tab.name }}
 
-    .dash(ng-controller='dashCtrl as dc' ng-show='tc.dashActive()' ng-cloak)
-      .input-group
-        input.form-control(type='text' placeholder='Username' ng-model='dc.username')
-        span.input-group-btn
-          button.btn(type='button' ng-class='dc.hasUser ? "btn-success" : "btn-primary"' ng-click='dc.submitUsername()') Set Username
+    .dash(ng-show='tc.dashActive()')
+      form(ng-controller='uNameCtrl as uc' name='usernameForm' ng-submit='uc.submitUsername(usernameForm.$valid)' ng-disabled='uc.socketing' novalidate
+      ng-class='{"has-error": usernameForm.username.$invalid && !usernameForm.username.$pristine}')
+        .form-group
+          .input-group
+            input.form-control(type='text' name='username' placeholder='Username' ng-model='uc.username' required)
+            span.input-group-btn
+              button.btn(type='submit' ng-class='uc.hasUser ? "btn-success" : "btn-primary"') {{ uc.hasUser ? 'Change Username' : 'Set Username' }}
