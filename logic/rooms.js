@@ -176,7 +176,6 @@ var Room = function(id, name, pub, maxUsers) {
 
   /**
    * Randomly gets a connected user to be the new mod.
-   * http://stackoverflow.com/a/2532251/2014825
    * @return  the user to set as mod, null if no user available
    */
   this.getNextMod = function() {
