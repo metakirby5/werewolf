@@ -109,7 +109,7 @@
     })
   }]);
 
-  // Uesrname
+  // Username
   app.controller('uNameCtrl', ['socket', function(socket) {
     var thiz = this;
     socket.set(ws);

@@ -106,7 +106,7 @@ module.exports = function(io) {
         return;
       }
 
-      // Try to get or add user
+      // Cookie validation
       var parsedId = parseSignedCookie(userId);
       if (!parsedId) {
         console.log('cookie ' + userId + ' was invalid!');
@@ -114,6 +114,7 @@ module.exports = function(io) {
         return;
       }
 
+      // Try to get or add user
       console.log('adding user ' + parsedId + ': ' + name);
       user = new User(parsedId, socket, name);
       try {
@@ -127,6 +128,36 @@ module.exports = function(io) {
         console.log(e);
         socket.emit('notif:danger', e);
       }
+    });
+
+    socket.on('user:setName', function(data) {
+      // Safety checks
+      if (!data || !('userId' in data && 'name' in data)) {
+        socket.emit('notif:danger', 'Some data was missing - please try again.');
+        return;
+      }
+
+      var userId = data.userId,
+          name = data.name;
+
+      // Is name empty?
+      if (name === '') {
+        socket.emit('notif:danger', 'Username cannot be empty.');
+        return;
+      }
+
+      // Cookie validation
+      var parsedId = parseSignedCookie(userId);
+      if (!parsedId) {
+        console.log('cookie ' + userId + ' was invalid!');
+        socket.emit('notif:danger', 'Please clear your cookies.');
+        return;
+      }
+
+      // Set new name for user
+      console.log('\'' + user.getName() + '\' changed name to \'' + name + '\'');
+      socket.emit('notif:success', 'Changed name to ' + name + '!');
+      user.setName(name);
     });
   });
 };
