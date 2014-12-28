@@ -1,9 +1,9 @@
+"use strict";
+
 var cookieParser = require('cookie-parser');
 var secret = process.env.COOKIE_SECRET;
 var rooms = require('../logic/rooms');
 var User = require('../logic/user').User;
-
-'use strict';
 
 module.exports = function(io) {
 
@@ -13,8 +13,34 @@ module.exports = function(io) {
     var room, user;
 
     socket.on('disconnect', function() {
-      // TODO: if mod d/cs, end the game and delete the room
-      console.log('disconnected');
+      if (user && room) {
+
+        room.userDisconnected(user);
+
+        // Mod has disconnected
+        if (user.getId() === room.getMod().getId()) {
+          console.log('mod \'' + user.getName() + '\' has disconnected');
+          var nextMod = room.getNextMod(user);
+
+          // Another connected player available? Assign new mod
+          if (nextMod) {
+            console.log('new mod assigned: ' + nextMod.getName());
+            room.setMod(nextMod);
+          }
+
+          // No available mod - end the game, destroy the room
+          else {
+            console.log('no mods available - ending game and deleting room');
+            rooms.deleteRoom(room.getId());
+          }
+        }
+
+        // Player disconnected - pause game
+        else {
+          console.log('player \'' + user.getName() + '\' has disconnected');
+          // TODO: game pause logic
+        }
+      }
     });
 
     socket.on('room:join', function(roomId) {
@@ -52,6 +78,8 @@ module.exports = function(io) {
       if (user) {
         console.log('found user');
         console.log(user.repr());
+        user.setSocket(socket);
+        room.userConnected(user);
         socket.emit('user:found', user.repr());
         socket.emit('notif:success', 'Rejoined room as ' + user.getName() + '!');
       } else {
@@ -84,6 +112,7 @@ module.exports = function(io) {
       user = new User(parsedId, socket, name);
       try {
         room.addUser(user);
+        room.userConnected(user);
         console.log(user.repr());
         console.log(room.getUserCount() + ' users now in room ' + room.getName());
         socket.emit('user:found', user.repr());

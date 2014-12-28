@@ -1,3 +1,5 @@
+"use strict";
+
 var uuid = require('node-uuid');
 
 /**
@@ -58,6 +60,14 @@ var User = function(id, socket, name, card, state) {
    */
   this.getId = function() {
     return _id;
+  };
+
+  /**
+   * Getter for name.
+   * @returns user name
+   */
+  this.getName = function() {
+    return _name;
   };
 
   /**
