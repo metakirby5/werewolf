@@ -29,22 +29,21 @@
 
     this.notifs = [];
 
+    this.addNotif = function(msg, type) {
+      var notif = new Notif(msg, type);
+      this.notifs.unshift(notif);
+      setTimeout(function() {
+        $scope.$apply(function() {
+          thiz.dismissNotif(notif);
+        });
+      }, NOTIF_TIMEOUT);
+    };
     this.dismissNotif = function(notif) {
       var idx = thiz.notifs.indexOf(notif);
       // Did we already dismiss?
       if (idx === -1)
         return;
       thiz.notifs.splice(idx, 1);
-    };
-
-    this.addNotif = function(msg, type) {
-      var notif = new Notif(msg, type);
-      this.notifs.unshift(notif); // TODO: figure out best notif anims
-      setTimeout(function() {
-        $scope.$apply(function() {
-          thiz.dismissNotif(notif);
-        });
-      }, NOTIF_TIMEOUT);
     };
 
     // Client messages
