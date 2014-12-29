@@ -7,15 +7,29 @@
   // TODO: turn elements into directives
   // TODO: let mod set room name
 
-  // Event passer-arounder
-  var ee = new EventEmitter();
-
   // Socket variables
   var ws = io.connect();
   var user;
 
   // Angular stuff
-  var app = angular.module('gameRoomApp', ['ngAnimate', 'socketioService']);
+  var app = angular.module('gameRoomApp', ['ngAnimate', 'socketioService']).
+
+    // Monkey patch event listener registration
+    // http://stackoverflow.com/questions/11252780/whats-the-correct-way-to-communicate-between-controllers-in-angularjs
+    config(['$provide', function($provide){
+      $provide.decorator('$rootScope', ['$delegate', function($delegate){
+        Object.defineProperty($delegate.constructor.prototype, '$onRS', {
+          value: function(name, listener){
+            var unsubscribe = $delegate.$on(name, listener);
+            this.$on('$destroy', unsubscribe);
+
+            return unsubscribe;
+          },
+          enumerable: false
+        });
+        return $delegate;
+      }]);
+    }]);
 
   // Notification messages
   app.controller('notifsCtrl', ['$scope', 'socket', function($scope, socket) {
@@ -70,7 +84,7 @@
   }]);
 
   // Tabs
-  app.controller('tabsCtrl', ['$scope', 'socket', function($scope, socket) {
+  app.controller('tabsCtrl', ['$scope', '$rootScope', 'socket', function($scope, $rootScope, socket) {
     var thiz = this;
     socket.set(ws);
 
@@ -83,7 +97,7 @@
     this.active = this.tabs[0].name;
 
     this.setTab = function(tabName) {
-      ee.emit('tabChange', this.active, tabName);
+      $rootScope.$emit('tabsCtrl:tabChange', this.active, tabName);
       thiz.active = tabName;
     };
     this.isActive  = function(tabName) { return tabName === thiz.active; };
@@ -112,7 +126,7 @@
   }]);
 
   // Username
-  app.controller('uNameCtrl', ['socket', function(socket) {
+  app.controller('uNameCtrl', ['$scope', 'socket', function($scope, socket) {
     var thiz = this;
     socket.set(ws);
 
@@ -123,7 +137,7 @@
       return !user || thiz.username !== user.name;
     };
 
-    ee.on('tabChange', function(from, to) {
+    $scope.$onRS('tabsCtrl:tabChange', function(from, to) {
       if (from !== 'Dashboard' && to === 'Dashboard')
         thiz.username = user ? user.name : '';
     });
