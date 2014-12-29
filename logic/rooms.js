@@ -128,13 +128,34 @@ var Room = function(id, name, pub, maxUsers) {
 
     // Do we have a unique username?
     if (user.getName() in _usernames)
-      throw 'Duplicate username: ' + user.getName();
+      throw 'Duplicate username: "' + user.getName() + '"';
 
     if (this.getUserCount() === 0)
       _mod = user;
 
     _users[user.getId()] = user;
     _usernames[user.getName()] = true;
+  };
+
+  /**
+   * Sets a user's name, ensuring it has changed and is unique in the room.
+   * @param user  The user to change
+   * @param name  The name to change to
+   */
+  this.setUserName = function(user, name) {
+    // Is the name different?
+    if (user.getName() === name)
+      throw 'Name unchanged.';
+
+    // Do we have a unique username?
+    if (name in _usernames)
+      throw 'Duplicate username: "' + name + '"';
+
+    // Update username hash
+    delete _usernames[user.getName()];
+    _usernames[name] = true;
+
+    user.setName(name);
   };
 
   /**

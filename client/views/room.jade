@@ -16,9 +16,9 @@ block content
 
     .dash(ng-show='tc.dashActive()')
       form(ng-controller='uNameCtrl as uc' name='usernameForm' ng-submit='uc.submitUsername(usernameForm.$valid)' ng-disabled='uc.socketing' novalidate
-      ng-class='{"has-error": usernameForm.username.$invalid && !usernameForm.username.$pristine}')
+      ng-class='{"has-error": usernameForm.$invalid && !usernameForm.$pristine}')
         .form-group
           .input-group
             input.form-control(type='text' name='username' placeholder='Username' ng-model='uc.username' required)
             span.input-group-btn
-              button.btn(type='submit' ng-class='uc.hasUser ? "btn-success" : "btn-primary"') {{ uc.hasUser ? 'Change Username' : 'Set Username' }}
+              button.btn(type='submit' ng-class='uc.hasUser ? "btn-success" : "btn-primary"' ng-disabled='usernameForm.$invalid || !uc.usernameChanged()') {{ uc.hasUser ? 'Change Username' : 'Set Username' }}
