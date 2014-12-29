@@ -6,6 +6,7 @@
 
   // TODO: turn elements into directives
   // TODO: let mod set room name
+  // TODO: prevent emitting to socket if there is no room (disconnect -> reconnect to nonexistent room) - maybe a modal?
 
   // Socket variables
   var ws = io.connect();
