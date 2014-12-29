@@ -90,7 +90,6 @@ module.exports = function(io) {
       }
     });
 
-    // TODO: add setName event
     socket.on('user:add', function(data) {
       // Safety checks
       if (!data || !('userId' in data && 'name' in data)) {
