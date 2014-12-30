@@ -204,7 +204,11 @@ var Room = function(id, name, pub, maxUsers) {
    * @return  the user to set as mod, null if no user available
    */
   this.getNextMod = function() {
-    return _.sample(_connectedUsers);
+    var nextMod;
+    do
+      nextMod = _.sample(_connectedUsers);
+    while (_mod === nextMod);
+    return nextMod;
   }
 };
 
