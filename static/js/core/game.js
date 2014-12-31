@@ -19,7 +19,8 @@ var Game = function(players) {
    *    {'werewolf': 2, 'doctor': 1}
    * with the role name as the key, and its desired count as the value.
    * The 'villager' key is optional, as it is ignored.
-   * @returns true if assignment successful, false if error occurred
+   * @param roles   The roles specification object
+   * @returns       True if assignment successful, false if error occurred
    */
   this.assignRoles = function(roles) {   
     var deck = [];   
@@ -55,6 +56,19 @@ var Game = function(players) {
     }
 
     return true;
+  };
+
+  /**
+   * Gets a list of all users with the specified card.
+   * @param card  The name of the card
+   * @return      List of all user objects with the given card
+   */
+  this.getPlayersWithCard = function(card) {
+    var result = [];
+    for (var player in _players)
+      if (_players[player].getCard() === card)
+        result.push(_players[player]);
+    return result;
   }
 };
 
@@ -72,11 +86,18 @@ var test_assignRoles = function() {
 
   var roles = {'werewolf': 2, 'seer': 1};
 
+  // Assign roles
   var game = new Game(players);
   game.assignRoles(roles);
 
   for (var p in players)
     console.log(players[p].repr());
+
+  // Get all werewolves
+  console.log("\nAll werewolves:");
+  var werewolves = game.getPlayersWithCard(WEREWOLF);
+  for (var i = 0; i < werewolves.length; i++)
+    console.log(werewolves[i].repr());
 }
 
 test_assignRoles();
