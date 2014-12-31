@@ -1,6 +1,7 @@
 "use strict";
 
 var _ = require('lodash');
+var User = require('../../../logic/user.js').User;
 
 var WEREWOLF = 'werewolf',
     VILLAGER = 'villager',
@@ -10,7 +11,7 @@ var WEREWOLF = 'werewolf',
 var VALID_CARDS = [WEREWOLF, VILLAGER, SEER, DOCTOR];
 
 var Game = function(players) {
-  var _players = players ? players : {};  // map player id to role card
+  var _players = players ? players : {};  // maps user ID to user object
   
   /**
    * Randomly assigns role cards to players, based on the count
@@ -50,7 +51,7 @@ var Game = function(players) {
     // Assign role cards to players
     for (var player in _players) {
       var card = deck.pop();
-      _players[player] = card;
+      _players[player].setCard(card);
     }
 
     return true;
@@ -62,17 +63,20 @@ var Game = function(players) {
 
 var test_assignRoles = function() {
   var players = {};
-  players['i'] = players['h'] = players['g'] = 
-  players['f'] = players['e'] = players['d'] = 
-  players['c'] = players['b'] = players['a'] = null;
+  players['a'] = new User(1, null, 'a');
+  players['b'] = new User(2, null, 'b');
+  players['c'] = new User(3, null, 'c');
+  players['d'] = new User(4, null, 'd');
+  players['e'] = new User(5, null, 'e');
+  players['f'] = new User(6, null, 'f');
 
-  var roles = {'werewolf': 2, 'seer': 1, 'doctor': 2};
+  var roles = {'werewolf': 2, 'seer': 1};
 
   var game = new Game(players);
   game.assignRoles(roles);
 
   for (var p in players)
-    console.log(p + " : " + players[p]);
+    console.log(players[p].repr());
 }
 
 test_assignRoles();

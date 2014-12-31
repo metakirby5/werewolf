@@ -21,9 +21,10 @@ var User = function(id, socket, name, card, state) {
   this.state = state ? state : {};
 
   // On disconnect, deregister this socket
-  _socket.on('disconnect', function() {
-    _socket = null;
-  });
+  if (_socket)
+    _socket.on('disconnect', function() {
+      _socket = null;
+    });
 
   /**
    * Returns a JSON representation of user
@@ -55,14 +56,31 @@ var User = function(id, socket, name, card, state) {
   }
 
   /**
+   * Getter for card.
+   * @returns card name
+   */
+  this.getCard = function() {
+    return _card;
+  }
+
+  /**
+   * Setter for card.
+   * @param new card name
+   */
+  this.setCard = function(card) {
+    _card = card;
+  }
+
+  /**
    * Sets the user's socket.
    * @param socket  The socket to set to
    */
   this.setSocket = function(socket) {
     _socket = socket;
-    _socket.on('disconnect', function() {
-      _socket = null;
-    });
+    if (_socket)
+      _socket.on('disconnect', function() {
+        _socket = null;
+      });
   };
 
   /**
