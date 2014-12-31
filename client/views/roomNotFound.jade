@@ -1,5 +1,10 @@
 extends global/base
 
 block content
-  p ROOM ID #{roomId} NOT FOUND
-
+  h1= 404
+  p 
+    | Sorry, the room 
+    strong #{roomId} 
+    | no longer exists (because everyone left), or was typed incorrectly. 
+    br
+    a(href='../') Try making a new room!
