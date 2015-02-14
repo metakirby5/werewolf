@@ -6,6 +6,12 @@ var rooms = require('../logic/rooms');
 
 // Client index
 router.
+  get('/webrtc_prototype', function(req, res) {
+    res.render('webrtc_prototype', {
+      title: 'webRTC',
+      js: ['webrtc_prototype']
+    });
+  }).
   get('/', function(req, res) {
     res.render('index', {
       title: 'Werewolf',

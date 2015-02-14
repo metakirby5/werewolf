@@ -9,7 +9,7 @@
   // TODO: prevent emitting to socket if there is no room (disconnect -> reconnect to nonexistent room) - maybe a modal?
 
   // Socket variables
-  var ws = io.connect();
+  var ws = io('/room');
   var user;
 
   // Angular stuff

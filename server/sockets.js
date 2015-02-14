@@ -7,7 +7,10 @@ var User = require('../logic/user').User;
 
 module.exports = function(io) {
 
-  io.on('connection', function(socket) {
+  require('./sockets/webrtc_prototype')(io.of('/webrtc_prototype'));
+
+  // TODO: modularize/namespace
+  io.of('/room').on('connection', function(socket) {
     console.log('connected');
 
     var room, user;
