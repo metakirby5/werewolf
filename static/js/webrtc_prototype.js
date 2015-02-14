@@ -2,29 +2,43 @@
 
   navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-  var ws = io('/webrtc_prototype');
-  var id;
+  var sigChannel = io('/webrtc_prototype');
 
-  ws.on('connect', function() {
+  sigChannel.on('connect', function() {
     console.log('connected - adding user');
-    ws.emit('user:new', prompt('username?'));
+    sigChannel.emit('user:new', prompt('username?'));
   });
 
-  ws.on('user:pushId', function(data) {
-    id = data;
-    console.log(id);
+  sigChannel.on('peer:doOffer', function(userId) {
+    console.log('Offering to ' + userId);
+    // join private channel
+    var privateChannel = io('/webrtc_prototype/' + userId);
+    sigChannel.emit('privateChannel:new', userId);
   });
 
-  function openSignalling() {
-
-  }
+  sigChannel.on('peer:doAnswer', function(userId) {
+    console.log('Answering to ' + userId);
+    // join private channel
+    var privateChannel = io('/webrtc_prototype/' + userId);
+  });
 
   function offer() {
-
+    return 'OFFER';
   }
 
   function answer() {
+    return 'ANSWER';
+  }
 
+  function breakIce(peer, channel) {
+    peer.onicecandidate = function (evt) {
+      channel.emit('ice:send', evt.candidate.ice);
+    };
+
+    channel.on('ice:send', function (candidate) {
+      if (candidate)
+        peer.addIceCandidate(new RTCIceCandidate(candidate));
+    });
   }
 
   // Local video stuff
