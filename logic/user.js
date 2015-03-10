@@ -43,6 +43,7 @@ var User = function(id, socket, name, card, state) {
    * @returns name
    */
   this.getName = function() {
+    console.log("DEPRECATED getName");
     return _name;
   };
 
@@ -51,6 +52,7 @@ var User = function(id, socket, name, card, state) {
    * @param name  The name to set to.
    */
   this.setName = function(name) {
+    console.log("DEPRECATED setName");
     _name = name;
   };
 
@@ -60,14 +62,6 @@ var User = function(id, socket, name, card, state) {
    */
   this.getId = function() {
     return _id;
-  };
-
-  /**
-   * Getter for name.
-   * @returns user name
-   */
-  this.getName = function() {
-    return _name;
   };
 
   /**

@@ -19,12 +19,12 @@ module.exports = function(io) {
 
         // Mod has disconnected
         if (user.getId() === room.getMod().getId()) {
-          console.log('mod "' + user.getName() + '" has disconnected');
+          console.log('mod "' + room.getUserName(user) + '" has disconnected');
           var nextMod = room.getNextMod(user);
 
           // Another connected player available? Assign new mod
           if (nextMod) {
-            console.log('new mod assigned: "' + nextMod.getName() + '"');
+            console.log('new mod assigned: "' + room.getUserName(nextMod) + '"');
             room.setMod(nextMod);
           }
 
@@ -38,7 +38,7 @@ module.exports = function(io) {
 
         // Player disconnected - pause game
         else {
-          console.log('player "' + user.getName() + '" has disconnected');
+          console.log('player "' + room.getUserName(user) + '" has disconnected');
           // TODO: game pause logic
         }
       }
@@ -82,7 +82,7 @@ module.exports = function(io) {
         user.setSocket(socket);
         room.userConnected(user);
         socket.emit('user:update', user.repr());
-        socket.emit('notif:success', 'Rejoined room as "' + user.getName() + '"!');
+        socket.emit('notif:success', 'Rejoined room as "' + room.getUserName(user) + '"!');
       } else {
         console.log('user not found, requesting info');
         socket.emit('notif:warning', 'Please enter your username.');
@@ -115,7 +115,7 @@ module.exports = function(io) {
       console.log('adding user ' + parsedId + ': "' + name + '"');
       user = new User(parsedId, socket, name);
       try {
-        room.addUser(user);
+        room.addUser(user, name);
         room.userConnected(user);
         console.log(user.repr());
         console.log(room.getUserCount() + ' users now in room ' + room.getName());
@@ -149,7 +149,7 @@ module.exports = function(io) {
         return;
 
       // Set new name for user
-      var oldName = user.getName();
+      var oldName = room.getUserName(user);
       try {
         room.setUserName(user, name);
       } catch (e) {
