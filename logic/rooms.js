@@ -153,7 +153,7 @@ var Room = function(id, name, pub, maxUsers) {
    */
   this.setUserName = function(user, name) {
     // Is the name different?
-    if (getUserName(user) === name)
+    if (this.getUserName(user) === name)
       throw 'Name unchanged.';
 
     // Do we have a unique username?
