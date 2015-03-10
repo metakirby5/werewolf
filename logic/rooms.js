@@ -127,7 +127,7 @@ var Room = function(id, name, pub, maxUsers) {
       throw 'User already added.';
 
     // Do we have a unique username?
-    if (name in Object.keys(_usernames))
+    if (this.containsUserName(name))
       throw 'Duplicate username: "' + name + '"';
 
     if (this.getUserCount() === 0)
@@ -157,11 +157,24 @@ var Room = function(id, name, pub, maxUsers) {
       throw 'Name unchanged.';
 
     // Do we have a unique username?
-    if (name in Object.keys(_usernames))
+    if (this.containsUserName(name))
       throw 'Duplicate username: "' + name + '"';
 
     // Update username hash
     _usernames[user.getId()] = name;
+  };
+
+  /**
+   * Checks if this room already contains a username.
+   * @param name    The name to check
+   * @returns       True if contains, false otherwise
+   */
+  this.containsUserName = function(name) {
+    for (var id in _usernames)
+      if (name === _usernames[id])
+        return true;
+
+    return false;
   };
 
   /**

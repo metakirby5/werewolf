@@ -129,7 +129,7 @@ module.exports = function(io) {
 
     socket.on('user:setName', function(data) {
       // Safety checks
-      if (!data || !('userId' in data && 'name' in data)) {
+      if (!room || !data || !('userId' in data && 'name' in data)) {
         socket.emit('notif:danger', 'Some data was missing - please try again.');
         return;
       }
