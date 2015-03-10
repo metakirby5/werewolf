@@ -113,7 +113,7 @@ module.exports = function(io) {
 
       // Try to get or add user
       console.log('adding user ' + parsedId + ': "' + name + '"');
-      user = new User(parsedId, socket, name);
+      user = new User(parsedId, socket);
       try {
         room.addUser(user, name);
         room.userConnected(user);
