@@ -6,17 +6,13 @@ var uuid = require('node-uuid');
  * Represents a user. Basically a wrapper over a socket.
  * @param socket  The socket of the user
  * @param card    The user's card
- * @param state   The user's state
  * @param id      (optional) The user's id
  * @constructor
  */
-var User = function(id, socket, card, state) {
+var User = function(id, socket, card) {
   var _id = id ? id : uuid.v4();
   var _socket = socket ? socket : null;
   var _card = card ? card : 'villager';
-
-  // Public state, because it needs to be easily mutable
-  this.state = state ? state : {};
 
   // On disconnect, deregister this socket
   _socket.on('disconnect', function() {
@@ -25,13 +21,12 @@ var User = function(id, socket, card, state) {
 
   /**
    * Returns a JSON representation of user
-   * @returns {{id: *, card: *, state: *}} representation
+   * @returns {{id: *, card: *}} representation
    */
   this.repr = function() {
     return {
       id: _id,
-      card: _card,
-      state: this.state
+      card: _card
     };
   };
 
