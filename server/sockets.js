@@ -19,12 +19,12 @@ module.exports = function(io) {
 
         // Mod has disconnected
         if (user.getId() === room.getMod().getId()) {
-          console.log('mod "' + user.getName() + '" has disconnected');
+          console.log('mod "' + room.getUserName(user) + '" has disconnected');
           var nextMod = room.getNextMod(user);
 
           // Another connected player available? Assign new mod
           if (nextMod) {
-            console.log('new mod assigned: "' + nextMod.getName() + '"');
+            console.log('new mod assigned: "' + room.getUserName(nextMod) + '"');
             room.setMod(nextMod);
           }
 
@@ -38,7 +38,7 @@ module.exports = function(io) {
 
         // Player disconnected - pause game
         else {
-          console.log('player "' + user.getName() + '" has disconnected');
+          console.log('player "' + room.getUserName(user) + '" has disconnected');
           // TODO: game pause logic
         }
       }
@@ -82,7 +82,7 @@ module.exports = function(io) {
         user.setSocket(socket);
         room.userConnected(user);
         socket.emit('user:update', user.repr());
-        socket.emit('notif:success', 'Rejoined room as "' + user.getName() + '"!');
+        socket.emit('notif:success', 'Rejoined room as "' + room.getUserName(user) + '"!');
       } else {
         console.log('user not found, requesting info');
         socket.emit('notif:warning', 'Please enter your username.');
@@ -113,13 +113,13 @@ module.exports = function(io) {
 
       // Try to get or add user
       console.log('adding user ' + parsedId + ': "' + name + '"');
-      user = new User(parsedId, socket, name);
+      user = new User(parsedId, socket);
       try {
-        room.addUser(user);
+        room.addUser(user, name);
         room.userConnected(user);
         console.log(user.repr());
         console.log(room.getUserCount() + ' users now in room ' + room.getName());
-        socket.emit('user:update', user.repr());
+        socket.emit('user:update', user.repr(), room.getUserName(user));
         socket.emit('notif:success', 'Added "' + name + '" to the room!');
       } catch (e) {
         console.log(e);
@@ -129,7 +129,7 @@ module.exports = function(io) {
 
     socket.on('user:setName', function(data) {
       // Safety checks
-      if (!data || !('userId' in data && 'name' in data)) {
+      if (!room || !data || !('userId' in data && 'name' in data)) {
         socket.emit('notif:danger', 'Some data was missing - please try again.');
         return;
       }
@@ -149,7 +149,7 @@ module.exports = function(io) {
         return;
 
       // Set new name for user
-      var oldName = user.getName();
+      var oldName = room.getUserName(user);
       try {
         room.setUserName(user, name);
       } catch (e) {
@@ -159,7 +159,7 @@ module.exports = function(io) {
       }
 
       // Update the client
-      socket.emit('user:update', user.repr());
+      socket.emit('user:update', user.repr(), room.getUserName(user));
       console.log('"' + oldName + '" changed name to "' + name + '"');
       socket.emit('notif:success', 'Changed name from "' + oldName + '" to "' + name + '"!');
     });

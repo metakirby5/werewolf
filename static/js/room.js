@@ -11,6 +11,7 @@
   // Socket variables
   var ws = io.connect();
   var user;
+  var username;
 
   // Angular stuff
   var app = angular.module('gameRoomApp', ['ngAnimate', 'socketioService']).
@@ -135,12 +136,12 @@
     this.hasUser = false;
     this.username = '';
     this.usernameChanged = function() {
-      return !user || thiz.username !== user.name;
+      return !user || thiz.username !== username;
     };
 
     $scope.$onRS('tabsCtrl:tabChange', function(from, to) {
       if (from !== 'Dashboard' && to === 'Dashboard')
-        thiz.username = user ? user.name : '';
+        thiz.username = user ? username : '';
     });
 
     this.submitUsername = function(valid) {
@@ -172,10 +173,11 @@
     ws.emit('user:get', $.cookie('userId'));
   });
 
-  ws.on('user:update', function(foundUser) {
+  ws.on('user:update', function(foundUser, name) {
     console.log('updating user');
     console.log(foundUser);
     user = foundUser;
+    username = name;
   });
 
 })(window.$ww, window.jQuery, window._, window.angular, window.io);

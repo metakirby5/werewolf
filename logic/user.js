@@ -4,21 +4,13 @@ var uuid = require('node-uuid');
 
 /**
  * Represents a user. Basically a wrapper over a socket.
- * @param socket  The socket of the user
- * @param name    The user's name
- * @param card    The user's card
- * @param state   The user's state
  * @param id      (optional) The user's id
+ * @param socket  The socket of the user
  * @constructor
  */
-var User = function(id, socket, name, card, state) {
+var User = function(id, socket) {
   var _id = id ? id : uuid.v4();
   var _socket = socket ? socket : null;
-  var _name = name ? name : 'Noname';
-  var _card = card ? card : 'villager';
-
-  // Public state, because it needs to be easily mutable
-  this.state = state ? state : {};
 
   // On disconnect, deregister this socket
   _socket.on('disconnect', function() {
@@ -27,31 +19,12 @@ var User = function(id, socket, name, card, state) {
 
   /**
    * Returns a JSON representation of user
-   * @returns {{id: *, name: *, card: *, state: *}} representation
+   * @returns {{id: *}} representation
    */
   this.repr = function() {
     return {
-      id: _id,
-      name: _name,
-      card: _card,
-      state: this.state
+      id: _id
     };
-  };
-
-  /**
-   * Getter for name.
-   * @returns name
-   */
-  this.getName = function() {
-    return _name;
-  };
-
-  /**
-   * Setter for name.
-   * @param name  The name to set to.
-   */
-  this.setName = function(name) {
-    _name = name;
   };
 
   /**
@@ -60,14 +33,6 @@ var User = function(id, socket, name, card, state) {
    */
   this.getId = function() {
     return _id;
-  };
-
-  /**
-   * Getter for name.
-   * @returns user name
-   */
-  this.getName = function() {
-    return _name;
   };
 
   /**

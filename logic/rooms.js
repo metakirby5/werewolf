@@ -19,9 +19,9 @@ var Room = function(id, name, pub, maxUsers) {
   var _name = name !== undefined ? name : 'Untitled Room';
   var _pub = pub !== undefined ? pub : true;                // public by default
   var _maxUsers = maxUsers !== undefined ? maxUsers : -1;   // no max by default
-  var _users = {};
-  var _usernames = {};
-  var _connectedUsers = {};
+  var _users = {};                                          // user id -> User object
+  var _usernames = {};                                      // user id -> name
+  var _connectedUsers = {};                                 // user id -> User object
   var _mod = null;
 
   this.game = 'TEMP';
@@ -117,7 +117,7 @@ var Room = function(id, name, pub, maxUsers) {
    * Adds a user to the room, if possible
    * @param           user
    */
-  this.addUser = function(user) {
+  this.addUser = function(user, name) {
     // Did we cap out on users?
     if (!(_maxUsers === -1 || this.getUserCount() < _maxUsers))
       throw 'Too many users.';
@@ -127,14 +127,23 @@ var Room = function(id, name, pub, maxUsers) {
       throw 'User already added.';
 
     // Do we have a unique username?
-    if (user.getName() in _usernames)
-      throw 'Duplicate username: "' + user.getName() + '"';
+    if (this.containsUserName(name))
+      throw 'Duplicate username: "' + name + '"';
 
     if (this.getUserCount() === 0)
       _mod = user;
 
     _users[user.getId()] = user;
-    _usernames[user.getName()] = true;
+    _usernames[user.getId()] = name;
+  };
+
+  /**
+   * Gets a user's name from User object
+   * @param user    The User object
+   * @returns       The username associated with id, else undefined
+   */
+  this.getUserName = function(user) {
+    return (user.getId() in _usernames) ? _usernames[user.getId()] : undefined;
   };
 
   /**
@@ -144,18 +153,28 @@ var Room = function(id, name, pub, maxUsers) {
    */
   this.setUserName = function(user, name) {
     // Is the name different?
-    if (user.getName() === name)
+    if (this.getUserName(user) === name)
       throw 'Name unchanged.';
 
     // Do we have a unique username?
-    if (name in _usernames)
+    if (this.containsUserName(name))
       throw 'Duplicate username: "' + name + '"';
 
     // Update username hash
-    delete _usernames[user.getName()];
-    _usernames[name] = true;
+    _usernames[user.getId()] = name;
+  };
 
-    user.setName(name);
+  /**
+   * Checks if this room already contains a username.
+   * @param name    The name to check
+   * @returns       True if contains, false otherwise
+   */
+  this.containsUserName = function(name) {
+    for (var id in _usernames)
+      if (name === _usernames[id])
+        return true;
+
+    return false;
   };
 
   /**
