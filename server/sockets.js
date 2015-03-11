@@ -119,7 +119,7 @@ module.exports = function(io) {
         room.userConnected(user);
         console.log(user.repr());
         console.log(room.getUserCount() + ' users now in room ' + room.getName());
-        socket.emit('user:update', user.repr());
+        socket.emit('user:update', user.repr(), room.getUserName(user));
         socket.emit('notif:success', 'Added "' + name + '" to the room!');
       } catch (e) {
         console.log(e);
@@ -159,7 +159,7 @@ module.exports = function(io) {
       }
 
       // Update the client
-      socket.emit('user:update', user.repr());
+      socket.emit('user:update', user.repr(), room.getUserName(user));
       console.log('"' + oldName + '" changed name to "' + name + '"');
       socket.emit('notif:success', 'Changed name from "' + oldName + '" to "' + name + '"!');
     });
