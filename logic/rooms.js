@@ -2,6 +2,7 @@
 
 var shortId = require('shortid');
 var _ = require('lodash');
+var Game = require('./game.js').Game;
 
 var TIMEOUT = 5000; // ms
 var rooms = {};
@@ -24,7 +25,7 @@ var Room = function(id, name, pub, maxUsers) {
   var _connectedUsers = {};                                 // user id -> User object
   var _mod = null;
 
-  this.game = 'TEMP';
+  this.game = undefined;
 
   /**
    * Returns a JSON representation of the room
@@ -135,6 +136,10 @@ var Room = function(id, name, pub, maxUsers) {
 
     _users[user.getId()] = user;
     _usernames[user.getId()] = name;
+
+    // TODO: temp trigger to start game - remove me
+    if (name === 'last')
+      this.startGame();
   };
 
   /**
@@ -228,7 +233,12 @@ var Room = function(id, name, pub, maxUsers) {
       nextMod = _.sample(_connectedUsers);
     while (_mod === nextMod);
     return nextMod;
-  }
+  };
+
+  this.startGame = function() {
+    this.game = new Game(_users);
+    this.game.setup();
+  };
 };
 
 /**
