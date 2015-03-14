@@ -5,37 +5,31 @@ var _ = require('lodash');
 
 module.exports = function(io) {
 
-  var userIds = [];
+  // Contains user sockets
+  var users = {};
 
-  io.on('connection', function(signalChannel) {
+  io.on('connection', function(socket) {
 
     var user;
 
-    signalChannel.on('user:new', function(name) {
+    socket.on('s:user:new', function(name) {
       console.log('adding ' + name);
-      user = new User(null, signalChannel, name);
+      user = new User(null, socket, name);
 
       // Push all existing id's to this id as offer
-      _(userIds).forEach(function(userId) {
-        signalChannel.emit('peer:doOffer', userId);
-      });
+      for (var userId in users) {
+        if (users.hasOwnProperty(userId)) {
+          users[userId].emit('c:peer:doOffer', userId);
+        }
+      }
 
       // Add id
-      userIds.push(user.getId());
+      users[user.getId()] = socket;
     });
 
-    signalChannel.on('privateChannel:new', function(userId) {
-      var pc = io.of('/' + userId);
+    socket.on('s:sdp:send', function(data) {
 
-      pc.on('connection', function(privateChannel) {
-        // pass-thru
-        privateChannel.on('message', function(data) {
-          privateChannel.broadcast.send(data);
-        });
-
-        // Push this id to all existing id's as answer
-        signalChannel.broadcast.emit('peer:doAnswer', userIds.slice(-1)[0]);
-      });
     });
+
   });
 };
